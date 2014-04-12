@@ -22,6 +22,7 @@ setup(name='pyecma',
       # http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Programming Language :: Python",
+        "Programming Language :: Python3",
         ],
       keywords='Python3, Python, Javascript, ECMA, ECMAScript, grako',
       author='Samuel Riolo',
@@ -30,13 +31,15 @@ setup(name='pyecma',
       license='gpl',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
-      namespace_packages=['pyecma'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
       ],
+      extras_require={
+          'build': ['grako']
+      },
       entry_points="""
       # -*- Entry points: -*-
       """,
