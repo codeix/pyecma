@@ -1,87 +1,117 @@
 (* http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262%20edition%205.1,%20June%202011.pdf *)
 
 
-(* T_ types *)
-T_NUMBER = ?/[0-9]+/? ;
-
 (* K_ Keywords 7.6.1.1 *)
 
-K_BREAK = ?/break/? ;
-K_DO = ?/do/? ;
-K_INSTANCEOF = ?/instanceof/? ;
-K_TYPEOF = ?/typeof/? ;
-K_CASE = ?/case/? ;
-K_ELSE = ?/else/? ;
-K_NEW = ?/new/? ;
-K_VAR = ?/var/? ;
-K_CATCH = ?/catch/? ;
-K_FINALLLY = ?/finally/? ;
-K_RETURN = ?/return/? ;
-K_VOID = ?/void/? ;
-K_CONTINUE = ?/continue/? ;
-K_FOR = ?/for/? ;
-K_SWITCH = ?/switch/? ;
-K_WHILE = ?/while/? ;
-K_DEBUGGER = ?/debugger/? ;
-K_FUNCTION = ?/function/? ;
-K_THIS = ?/this/? ;
-K_WITH = ?/with/? ;
-K_DEFAULT = ?/default/? ;
-K_IF = ?/if/? ;
-K_THROW = ?/throw/? ;
-K_DELETE = ?/delete/? ;
-K_IN = ?/in/? ;
-K_TRY = ?/try/? ;
+K_BREAK = (?/break/?) ;
+K_DO = (?/do/?) ;
+K_INSTANCEOF = (?/instanceof/?) ;
+K_TYPEOF = (?/typeof/?) ;
+K_CASE = (?/case/?) ;
+K_ELSE = (?/else/?) ;
+K_NEW = (?/new/?) ;
+K_VAR = (?/var/?) ;
+K_CATCH = (?/catch/?) ;
+K_FINALLLY = (?/finally/?) ;
+K_RETURN = (?/return/?) ;
+K_VOID = (?/void/?) ;
+K_CONTINUE = (?/continue/?) ;
+K_FOR = (?/for/?) ;
+K_SWITCH = (?/switch/?) ;
+K_WHILE = (?/while/?) ;
+K_DEBUGGER = (?/debugger/?) ;
+K_FUNCTION = (?/function/?) ;
+K_THIS = (?/this/?) ;
+K_WITH = (?/with/?) ;
+K_DEFAULT = (?/default/?) ;
+K_IF = (?/if/?) ;
+K_THROW = (?/throw/?) ;
+K_DELETE = (?/delete/?) ;
+K_IN = (?/in/?) ;
+K_TRY = (?/try/?) ;
 
 
 (* P_ Punctuators 7.7 *)
-P_SCB = ?/\{/? ;    (* Start code block *)
-P_ECB = ?/\}/? ;    (* End code block *)
-P_S_FUNC_DELI = ?/\(/? ;    (* Function argument delimiter and precedence control *)
-P_E_FUNC_DELI = ?/\)/? ;    (* Function argument delimiter and precedence control *)
-P_S_ARRAY_DELI = ?/\[/? ;    (* Array index delimiter *)
-P_E_ARRAY_DELI = ?/\]/? ;    (* Array index delimiter *)
-P_ACCESSOR = ?/\./? ;    (* Property accessor *)
-P_STAT_TERMINATOR = ?/;/? ;    (* Statement terminator *)
-P_ARGS_DELIMITER = ?/,/? ;    (* Argument delimiter *)
-P_LT = ?/</? ;    (* Less than *)
-P_GT = ?/>/? ;    (* Greater than *)
-P_LTE = ?/<=/? ;    (* Less than or equal to *)
-P_GTE = ?/>=/? ;    (* Greater than or equal to *)
-P_EQUAL = ?/==/? ;    (* Equal to *)
-P_NOT_EQUAL = ?/!=/? ;    (* Not equal to *)
-P_E_EQUAL = ?/===/? ;    (* Exactly equal to >ECMA edition 3< *)
-P_E_NOT_EQUAL = ?/!==/? ;    (* Not exactly equal to >ECMA edition 3< *)
-P_PLUS = ?/\+/? ;    (* Unary plus, add, concatenate string *)
-P_MINUS = ?/-/? ;    (* Unary minus, subtract *)
-P_MULTIPLY = ?/\*/? ;    (* Multiply *)
-P_MODULO = ?/%/? ;    (* Modulo *)
-P_PLUS_INC = ?/\+\+/? ;    (* Postfix and prefix increment *)
-P_MINUS_INC = ?/--/? ;    (* Postfix and prefix decrement *)
-P_BITWISE_LEFT = ?/<</? ;    (* Bitwise shift left *)
-P_BITWISE_RIGHT = ?/>>/? ;    (* Bitwise shift right *)
-P_BITWISE_RIGHT_UNSIG = ?/>>>/? ;    (* Bitwise shift right (unsigned) *)
-P_BITWISE_AND = ?/&/? ;    (* Bitwise AND *)
-P_BITWISE_OR = ?/\|/? ;    (* Bitwise OR *)
-P_BITWISE_XOR = ?/\^/? ;    (* Bitwise XOR *)
-P_NOT = ?/!/? ;    (* Logical not *)
-P_BITWISE_NOT = ?/~/? ;    (* Bitwise NOT *)
-P_AND = ?/&&/? ;    (* Logical AND *)
-P_OR = ?/\|\|/? ;    (* Logical OR *)
-P_CONDITIONAL_OP = ?/\?/? ;    (* Conditional operator *)
-P_PART_CONDITIONAL_OP = ?/:/? ;    (* Part of conditional operator *)
-P_ASSIGN = ?/=/? ;    (* Assign value *)
-P_ASSIGN_PLUS = ?/\+=/? ;    (* Add and assign *)
-P_ASSIGN_MINUS = ?/-=/? ;    (* Subtract and assign *)
-P_ASSIGN_MULTIPLY = ?/\*=/? ;    (* Multiply and assign *)
-P_ASSIGN_MODULO = ?/%=/? ;    (* Modulo and assign *)
-P_ASSIGN_BITWISE_LEFT = ?/<<=/? ;    (* Bitwise shift left and assign *)
-P_ASSIGN_BITWISE_RIGHT = ?/>>=/? ;    (* Bitwise shift right and assign *)
-P_ASSIGN_BITWISE_RIGHT_UNSIG = ?/>>>=/? ;    (* Bitwise shift right (unsigned) and assign *)
-P_ASSIGN_BITWISE_AND = ?/&=/? ;    (* Bitwise AND and assign *)
-P_ASSIGN_BITWISE_OR = ?/\|=/? ;    (* Bitwise OR and assign *)
-P_ASSIGN_BITWISE_XOR = ?/\^=/? ;    (* Bitwise XOR and assign *)
+P_SCB = (?/\{/?) ;    (* Start code block *)
+P_ECB = (?/\}/?) ;    (* End code block *)
+P_S_FUNC_DELI = (?/\(/?) ;    (* Function argument delimiter and precedence control *)
+P_E_FUNC_DELI = (?/\)/?) ;    (* Function argument delimiter and precedence control *)
+P_S_ARRAY_DELI = (?/\[/?) ;    (* Array index delimiter *)
+P_E_ARRAY_DELI = (?/\]/?) ;    (* Array index delimiter *)
+P_ACCESSOR = (?/\./?) ;    (* Property accessor *)
+P_STAT_TERMINATOR = (?/;/?) ;    (* Statement terminator *)
+P_ARGS_DELIMITER = (?/,/?) ;    (* Argument delimiter *)
+P_LT = (?/</?) ;    (* Less than *)
+P_GT = (?/>/?) ;    (* Greater than *)
+P_LTE = (?/<=/?) ;    (* Less than or equal to *)
+P_GTE = (?/>=/?) ;    (* Greater than or equal to *)
+P_EQUAL = (?/==/?) ;    (* Equal to *)
+P_NOT_EQUAL = (?/!=/?) ;    (* Not equal to *)
+P_E_EQUAL = (?/===/?) ;    (* Exactly equal to >ECMA edition 3< *)
+P_E_NOT_EQUAL = (?/!==/?) ;    (* Not exactly equal to >ECMA edition 3< *)
+P_PLUS = (?/\+/?) ;    (* Unary plus, add, concatenate string *)
+P_MINUS = (?/-/?) ;    (* Unary minus, subtract *)
+P_MULTIPLY = (?/\*/?) ;    (* Multiply *)
+P_DIVIDE = (?/\//?) ;    (* Divide *)
+P_MODULO = (?/%/?) ;    (* Modulo *)
+P_PLUS_INC = (?/\+\+/?) ;    (* Postfix and prefix increment *)
+P_MINUS_INC = (?/--/?) ;    (* Postfix and prefix decrement *)
+P_BITWISE_LEFT = (?/<</?) ;    (* Bitwise shift left *)
+P_BITWISE_RIGHT = (?/>>/?) ;    (* Bitwise shift right *)
+P_BITWISE_RIGHT_UNSIG = (?/>>>/?) ;    (* Bitwise shift right (unsigned) *)
+P_BITWISE_AND = (?/&/?) ;    (* Bitwise AND *)
+P_BITWISE_OR = (?/\|/?) ;    (* Bitwise OR *)
+P_BITWISE_XOR = (?/\^/?) ;    (* Bitwise XOR *)
+P_NOT = (?/!/?) ;    (* Logical not *)
+P_BITWISE_NOT = (?/~/?) ;    (* Bitwise NOT *)
+P_AND = (?/&&/?) ;    (* Logical AND *)
+P_OR = (?/\|\|/?) ;    (* Logical OR *)
+P_CONDITIONAL_OP = (?/\(?/?) ;    (* Conditional operator *)
+P_PART_CONDITIONAL_OP = (?/:/?) ;    (* Part of conditional operator *)
+P_ASSIGN = (?/=/?) ;    (* Assign value *)
+P_ASSIGN_PLUS = (?/\+=/?) ;    (* Add and assign *)
+P_ASSIGN_MINUS = (?/-=/?) ;    (* Subtract and assign *)
+P_ASSIGN_MULTIPLY = (?/\*=/?) ;    (* Multiply and assign *)
+P_ASSIGN_DIVIDE = (?/\/=/?) ;    (* Divide and assign *)
+P_ASSIGN_MODULO = (?/%=/?) ;    (* Modulo and assign *)
+P_ASSIGN_BITWISE_LEFT = (?/<<=/?) ;    (* Bitwise shift left and assign *)
+P_ASSIGN_BITWISE_RIGHT = (?/>>=/?) ;    (* Bitwise shift right and assign *)
+P_ASSIGN_BITWISE_RIGHT_UNSIG = (?/>>>=/?) ;    (* Bitwise shift right (unsigned) and assign *)
+P_ASSIGN_BITWISE_AND = (?/&=/?) ;    (* Bitwise AND and assign *)
+P_ASSIGN_BITWISE_OR = (?/\|=/?) ;    (* Bitwise OR and assign *)
+P_ASSIGN_BITWISE_XOR = (?/\^=/?) ;    (* Bitwise XOR and assign *)
+
+(* Language *)
+L_WS = [?/(?:\s+)/?] ;
+L_VARIABLE = ?/(?:[A-z]+[0-9]*)+/? ;
+P_S_OPER_DELI = (?/\(/?) ;
+P_E_OPER_DELI = (?/\)/?) ;
 
 
+(* T_ Types 8 *)
+T_NUMBER = ?/[\+-]?[0-9]+(?:\.[0-9]*)?(?:[eE][-\+]?[0-9])?/? ;
+T_UNDEFINED = ?/undefined/? ;
+T_NULL = ?/null/? ;
+T_BOOL = ?/true|false/? ;
+T_STRING = ?/(?:".*")|(?:'.*')/? ;
 
+(* Grammar Groups *)
+OPERATORS = P_MINUS | P_PLUS | P_MULTIPLY | P_MODULO | P_DIVIDE | P_BITWISE_LEFT | P_BITWISE_RIGHT | P_BITWISE_RIGHT_UNSIG ;
+ASSIGN_OPERATORS = P_ASSIGN_PLUS | P_ASSIGN_MINUS | P_ASSIGN_MULTIPLY | P_ASSIGN_DIVIDE | P_ASSIGN_MODULO | P_ASSIGN_BITWISE_LEFT |
+                   P_ASSIGN_BITWISE_RIGHT | P_ASSIGN_BITWISE_RIGHT_UNSIG | P_ASSIGN_BITWISE_AND | P_ASSIGN_BITWISE_OR | P_ASSIGN_BITWISE_XOR ;
+CREMENT_OPERATORS = P_PLUS_INC | P_MINUS_INC ;
+COMPARE_OPERATORS = P_LT | P_GT | P_LTE | P_GTE | P_EQUAL | P_NOT_EQUAL | P_E_EQUAL | P_E_NOT_EQUAL ;
+TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING ;
+
+
+(* Grammar *)
+
+(* http://www.boost.org/doc/libs/1_54_0/libs/spirit/classic/doc/introduction.html *)
+expression  = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
+factor      = T_NUMBER | group ;
+term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
+group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
+
+
+(* Entry Points *)
 
