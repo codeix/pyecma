@@ -23,6 +23,7 @@ function secfunc (){
 def run():
     parser = EcmaParser()
     app=parser.parse(js, 'program', semantics=EcmaSemantics())
+    
     import pdb; pdb.set_trace()
     app.i
     

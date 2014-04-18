@@ -27,6 +27,10 @@ class EcmaSemantics(parser.EcmaSemantics):
     def function(self, ast):
         return elements.Function(ast)
 
+    def function_classic(self, ast):
+        ast['name'].create = True
+        return ast
+
     def code_block(self, ast):
         return elements.CodeBlock(ast)
 
