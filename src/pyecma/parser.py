@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.107.16.05.07'
+__version__ = '14.108.11.57.53'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -391,12 +391,11 @@ class EcmaParser(Parser):
 
     @rule_def
     def _L_WS_(self):
-        with self._optional():
-            self._pattern(r'(?:\s+)')
+        self._pattern(r'(?:\s+)')
 
     @rule_def
     def _L_VARIABLE_(self):
-        self._pattern(r'(?:[A-z]+[0-9]*)+')
+        self._pattern(r'((?:[A-z]+[0-9]*)+)')
 
     @rule_def
     def _P_S_OPER_DELI_(self):
@@ -544,7 +543,17 @@ class EcmaParser(Parser):
     def _factor_(self):
         with self._choice():
             with self._option():
-                self._T_NUMBER_()
+                with self._optional():
+                    self._L_WS_()
+                with self._group():
+                    with self._choice():
+                        with self._option():
+                            self._T_NUMBER_()
+                        with self._option():
+                            self._L_VARIABLE_()
+                        self._error('no available options')
+                with self._optional():
+                    self._L_WS_()
             with self._option():
                 self._group_()
             self._error('no available options')
@@ -575,6 +584,153 @@ class EcmaParser(Parser):
         self._expression_()
         self._cut()
         self._P_E_OPER_DELI_()
+
+    @rule_def
+    def _program_(self):
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._function_()
+                with self._option():
+                    self._statement_()
+                self._error('no available options')
+        self._closure(block0)
+
+    @rule_def
+    def _assign_(self):
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._variable_local_()
+                with self._option():
+                    self._variable_global_()
+                self._error('no available options')
+        self.ast['var'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        with self._group():
+            self._P_ASSIGN_()
+        self.ast['oper'] = self.last_node
+        with self._group():
+            self._expression_()
+        self.ast['ex'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_STAT_TERMINATOR_()
+
+    @rule_def
+    def _statement_(self):
+        with self._choice():
+            with self._option():
+                self._assign_()
+            with self._option():
+                with self._group():
+                    self._expression_()
+                    with self._optional():
+                        self._L_WS_()
+                    self._P_STAT_TERMINATOR_()
+            self._error('no available options')
+
+    @rule_def
+    def _variable_local_(self):
+        self._K_VAR_()
+        self._L_WS_()
+        self._L_VARIABLE_()
+        with self._optional():
+            self._L_WS_()
+
+    @rule_def
+    def _variable_global_(self):
+        self._L_VARIABLE_()
+        with self._optional():
+            self._L_WS_()
+
+    @rule_def
+    def _code_block_(self):
+        self._P_SCB_()
+        with self._optional():
+            self._L_WS_()
+        def block0():
+            self._statement_()
+        self._closure(block0)
+        with self._optional():
+            self._L_WS_()
+        self._P_ECB_()
+
+    @rule_def
+    def _arguments_(self):
+        with self._group():
+            with self._optional():
+                self._L_WS_()
+            def block0():
+                self._L_VARIABLE_()
+                with self._optional():
+                    self._L_WS_()
+                self._P_ARGS_DELIMITER_()
+                with self._optional():
+                    self._L_WS_()
+            self._closure(block0)
+            with self._optional():
+                self._L_VARIABLE_()
+            with self._optional():
+                self._L_WS_()
+
+    @rule_def
+    def _function_(self):
+        with self._choice():
+            with self._option():
+                self._function_classic_()
+            with self._option():
+                self._function_assign_()
+            self._error('no available options')
+
+    @rule_def
+    def _function_classic_(self):
+        self._K_FUNCTION_()
+        with self._optional():
+            self._L_WS_()
+        self._L_VARIABLE_()
+        self.ast['name'] = self.last_node
+        self._function_body_()
+        self.ast['body'] = self.last_node
+
+    @rule_def
+    def _function_assign_(self):
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._variable_local_()
+                with self._option():
+                    self._variable_global_()
+                self._error('no available options')
+        self.ast['name'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_ASSIGN_()
+        with self._optional():
+            self._L_WS_()
+        self._K_FUNCTION_()
+        with self._optional():
+            self._L_WS_()
+        self._function_body_()
+        self.ast['body'] = self.last_node
+
+    @rule_def
+    def _function_body_(self):
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._arguments_()
+        self.ast['sign'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._code_block_()
+        self.ast['code'] = self.last_node
 
 
 
@@ -857,6 +1013,39 @@ class EcmaSemantics(object):
         return ast
 
     def group(self, ast):
+        return ast
+
+    def program(self, ast):
+        return ast
+
+    def assign(self, ast):
+        return ast
+
+    def statement(self, ast):
+        return ast
+
+    def variable_local(self, ast):
+        return ast
+
+    def variable_global(self, ast):
+        return ast
+
+    def code_block(self, ast):
+        return ast
+
+    def arguments(self, ast):
+        return ast
+
+    def function(self, ast):
+        return ast
+
+    def function_classic(self, ast):
+        return ast
+
+    def function_assign(self, ast):
+        return ast
+
+    def function_body(self, ast):
         return ast
 
 def main(filename, startrule, trace=False):

@@ -82,8 +82,8 @@ P_ASSIGN_BITWISE_OR = (?/\|=/?) ;    (* Bitwise OR and assign *)
 P_ASSIGN_BITWISE_XOR = (?/\^=/?) ;    (* Bitwise XOR and assign *)
 
 (* Language *)
-L_WS = [?/(?:\s+)/?] ;
-L_VARIABLE = ?/(?:[A-z]+[0-9]*)+/? ;
+L_WS = ?/(?:\s+)/? ;
+L_VARIABLE = ?/((?:[A-z]+[0-9]*)+)/? ;
 P_S_OPER_DELI = (?/\(/?) ;
 P_E_OPER_DELI = (?/\)/?) ;
 
@@ -108,10 +108,24 @@ TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING ;
 
 (* http://www.boost.org/doc/libs/1_54_0/libs/spirit/classic/doc/introduction.html *)
 expression  = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
-factor      = T_NUMBER | group ;
+factor      = [L_WS] (T_NUMBER | L_VARIABLE) [L_WS] | group ;
 term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
 group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
 
+
+program         = {function | statement} ;
+assign          = var:(variable_local | variable_global) [L_WS] oper:(P_ASSIGN) ex:(expression) [L_WS] P_STAT_TERMINATOR ;
+statement       = assign | (expression [L_WS] P_STAT_TERMINATOR ) ;
+variable_local  = K_VAR L_WS L_VARIABLE [L_WS] ;
+variable_global = L_VARIABLE [L_WS] ;
+
+
+code_block       = P_SCB [L_WS] {statement} [L_WS] P_ECB ;
+arguments        = ([L_WS] {L_VARIABLE [L_WS] P_ARGS_DELIMITER [L_WS]} [L_VARIABLE] [L_WS]) ;
+function         = function_classic | function_assign ;
+function_classic = K_FUNCTION [L_WS] name:L_VARIABLE body:function_body;
+function_assign  = name:(variable_local | variable_global) [L_WS] P_ASSIGN [L_WS] K_FUNCTION [L_WS] body:function_body ;
+function_body    = [L_WS] P_S_FUNC_DELI [L_WS] sign:arguments [L_WS] P_E_FUNC_DELI [L_WS] code:code_block;
 
 (* Entry Points *)
 
