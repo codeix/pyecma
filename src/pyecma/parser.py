@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.108.11.57.53'
+__version__ = '14.108.12.39.22'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -601,9 +601,9 @@ class EcmaParser(Parser):
         with self._group():
             with self._choice():
                 with self._option():
-                    self._variable_local_()
+                    self._variable_create_()
                 with self._option():
-                    self._variable_global_()
+                    self._variable_set_()
                 self._error('no available options')
         self.ast['var'] = self.last_node
         with self._optional():
@@ -632,7 +632,7 @@ class EcmaParser(Parser):
             self._error('no available options')
 
     @rule_def
-    def _variable_local_(self):
+    def _variable_create_(self):
         self._K_VAR_()
         self._L_WS_()
         self._L_VARIABLE_()
@@ -640,7 +640,7 @@ class EcmaParser(Parser):
             self._L_WS_()
 
     @rule_def
-    def _variable_global_(self):
+    def _variable_set_(self):
         self._L_VARIABLE_()
         with self._optional():
             self._L_WS_()
@@ -699,9 +699,9 @@ class EcmaParser(Parser):
         with self._group():
             with self._choice():
                 with self._option():
-                    self._variable_local_()
+                    self._variable_create_()
                 with self._option():
-                    self._variable_global_()
+                    self._variable_set_()
                 self._error('no available options')
         self.ast['name'] = self.last_node
         with self._optional():
@@ -1024,10 +1024,10 @@ class EcmaSemantics(object):
     def statement(self, ast):
         return ast
 
-    def variable_local(self, ast):
+    def variable_create(self, ast):
         return ast
 
-    def variable_global(self, ast):
+    def variable_set(self, ast):
         return ast
 
     def code_block(self, ast):

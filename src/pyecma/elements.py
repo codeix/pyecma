@@ -10,6 +10,12 @@ class Scope(dict):
         self.parent = parent
     
     def __setitem__(self, variable, value):
+        if variable in self or self.parent is None:
+            super(Scope, self).__setitem__(str(variable), value)
+        else:
+            self.parent[str(variable)] = value
+
+    def create(self, variable, value):
         super(Scope, self).__setitem__(str(variable), value)
 
     def setglobal(self, variable, value):
@@ -37,11 +43,11 @@ class Program(object):
 
     def __init__(self, ast):
         self.__dict__ = Scope(Scope(None))
-        self.run(ast)
+        self.run(ast, self.__dict__)
 
-    def run(self, statements):
+    def run(self, statements, scope):
         for statement in statements:
-            statement.prepare(self.__dict__)
+            statement.prepare(scope)
 
 
 class CodeBlock(Program):
@@ -49,8 +55,8 @@ class CodeBlock(Program):
     def __init__(self, ast):
         self.statements = ast
     
-    def run(self):
-        super(CodeBlock, self).run(self.statements)
+    def run(self, scope):
+        super(CodeBlock, self).run(self.statements, scope)
 
 
 class Operator(object):
@@ -89,7 +95,10 @@ class Statement(object):
         else:
             re = scope.get(self.variable)
             re = self.assign(scope, re, self.expression(scope))
-            scope[self.variable] = re
+            if self.variable.create:
+                scope.create(self.variable, re)
+            else:
+                scope[self.variable] = re
 
     def prepare(self, scope):
         self(scope)
@@ -98,8 +107,8 @@ class Statement(object):
 class Function(object):
     
     def __init__(self, ast):
-        import pdb;pdb.set_trace()
         self.name = ast['name']
+        self.create = ast['name'].create
         self.code = ast['body']['code']
         sign = ast['body']['sign']
         if len(sign) is 2:
@@ -107,10 +116,29 @@ class Function(object):
         self.signatur = sign
     
     def __call__(self, *args):
-        self.code.run()
+        scope = Scope(self.scope)
+        for index, name in enumerate(self.signatur):
+            if len(args) > index:
+                scope[name] = self.cast(args[index])
+            else:
+                scope[name] = Undefinded()
+        scope['arguments'] = [self.cast(a) for a in args]
+        self.code.run(scope)
+        
+    def cast(self, value):
+        if isinstance(value, str):
+            return String(str)
+        elif isinstance(value, (int, float,)):
+            return String(str)
+        else:
+            raise ArgumentError('type was recognize for %s' % arg)
 
     def prepare(self, scope):
-        scope[self.name] = self
+        self.scope = scope
+        if self.create:
+            scope.create(self.name, self)
+        else:
+            scope[self.name] = self
     
     def __repr__(self):
         return '<ECMAScript Function %s>' % self.name
@@ -154,7 +182,17 @@ class Number(float):
         return '<ECMAScript Number <%s>>' % super(Number, self).__repr__()
 
 
+class String(str):
+    def __call__(self, scope):
+        return self
+    
+    def __repr__(self):
+        return '<ECMAScript String <%s>>' % super(String, self).__repr__()
+
+
 class Variable(object):
+    
+    create = False
     
     def __init__(self, name):
         self.name = name

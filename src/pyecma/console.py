@@ -10,8 +10,9 @@ var j = 5;
 var x = j + i;
 
 
-var myfunc =function (arg,ast){
-    i=1+1;
+var myfunc = function (arg, arg1){
+    var j= 8*8;
+    i = j;
 }
 
 function secfunc (){

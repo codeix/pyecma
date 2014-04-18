@@ -4,3 +4,7 @@ class EcmaException(Exception):
 
 class ReferenceError(EcmaException):
     pass
+
+
+class ArgumentError(EcmaException):
+    pass

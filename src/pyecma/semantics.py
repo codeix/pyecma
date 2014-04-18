@@ -30,6 +30,10 @@ class EcmaSemantics(parser.EcmaSemantics):
     def code_block(self, ast):
         return elements.CodeBlock(ast)
 
+    def variable_create(self, ast):
+        ast.create = True
+        return ast
+
     def L_VARIABLE(self, ast):
         return elements.Variable(ast)
 
