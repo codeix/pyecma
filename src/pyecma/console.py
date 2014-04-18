@@ -25,12 +25,22 @@ var myfunc = function (){
 function secfunc (arg){
     i=arg;
 }
+
+function echo (arg){
+    return arg ;
+}
+
+
+function multi (arg1, arg2){
+    return arg1 * arg2 ;
+}
+
 """
 
 def run():
     parser = EcmaParser()
     app=parser.parse(js, 'program', semantics=EcmaSemantics())
-    
+    app.echo('blup')
     import pdb; pdb.set_trace()
     app.i
     

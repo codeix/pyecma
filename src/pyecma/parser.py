@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.108.14.38.48'
+__version__ = '14.108.17.04.48'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -430,7 +430,7 @@ class EcmaParser(Parser):
                 self._pattern(r'".*"')
             with self._option():
                 self._pattern(r"'.*'")
-            self._error('expecting one of: ".*" \'.*\'')
+            self._error('expecting one of: \'.*\' ".*"')
 
     @rule_def
     def _OPERATORS_(self):
@@ -655,11 +655,28 @@ class EcmaParser(Parser):
         with self._optional():
             self._L_WS_()
         def block0():
-            self._statement_()
+            with self._choice():
+                with self._option():
+                    self._return_statement_()
+                with self._option():
+                    self._statement_()
+                self._error('no available options')
         self._closure(block0)
         with self._optional():
             self._L_WS_()
         self._P_ECB_()
+
+    @rule_def
+    def _return_statement_(self):
+        self._K_RETURN_()
+        with self._optional():
+            self._L_WS_()
+        with self._group():
+            self._expression_()
+            self.ast['ex'] = self.last_node
+            with self._optional():
+                self._L_WS_()
+            self._P_STAT_TERMINATOR_()
 
     @rule_def
     def _arguments_(self):
@@ -1035,6 +1052,9 @@ class EcmaSemantics(object):
         return ast
 
     def code_block(self, ast):
+        return ast
+
+    def return_statement(self, ast):
         return ast
 
     def arguments(self, ast):

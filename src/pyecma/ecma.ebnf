@@ -120,7 +120,8 @@ variable_create = K_VAR L_WS L_VARIABLE [L_WS] ;
 variable_set    = L_VARIABLE [L_WS] ;
 
 
-code_block       = P_SCB [L_WS] {statement} [L_WS] P_ECB ;
+code_block       = P_SCB [L_WS] {return_statement | statement} [L_WS] P_ECB ;
+return_statement = K_RETURN [L_WS] (ex:expression [L_WS] P_STAT_TERMINATOR) ;
 arguments        = ([L_WS] {L_VARIABLE [L_WS] P_ARGS_DELIMITER [L_WS]} [L_VARIABLE] [L_WS]) ;
 function         = function_classic | function_assign ;
 function_classic = K_FUNCTION [L_WS] name:L_VARIABLE body:function_body;

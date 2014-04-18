@@ -58,7 +58,10 @@ class CodeBlock(Program):
         self.statements = ast
     
     def run(self, scope):
-        super(CodeBlock, self).run(self.statements, scope)
+        for statement in self.statements:
+            re = statement.prepare(scope)
+            if re is not None:
+                return re
 
 
 class Operator(object):
@@ -106,14 +109,16 @@ class Assign(Operator):
     def __repr__(self):
         return '<ECMAScript Assign x=%sb>' % self.name
 
-    def autocasting(self, x, y):
-        return y.__class__, x, y
 
 
 class AssignSimple(Assign):
 
     def __init__(self):
         super(AssignSimple, self).__init__(lambda x,y: y, '=')
+
+    def autocasting(self, x, y):
+        return y.__class__, x, y
+
 
 class Statement(object):
     
@@ -133,7 +138,16 @@ class Statement(object):
             scope[self.variable] = re
 
     def prepare(self, scope):
-        self(scope)
+        return self(scope)
+
+
+class ReturnStatement(Statement):
+    
+    def __init__(self, expression):
+        self.expression = expression
+
+    def __call__(self, scope):
+        return self.expression(scope)
 
 
 class Function(object):
@@ -154,13 +168,13 @@ class Function(object):
             else:
                 scope.create(name, types.Undefinded())
         scope.create('arguments', [self.cast(a) for a in args])
-        self.code.run(scope)
+        return self.code.run(scope)
         
     def cast(self, value):
         if isinstance(value, str):
-            return String(str)
+            return types.String(value)
         elif isinstance(value, (int, float,)):
-            return String(str)
+            return types.Number(value)
         else:
             raise ArgumentError('type was recognize for %s' % arg)
 

@@ -22,6 +22,9 @@ class EcmaSemantics(parser.EcmaSemantics):
             return elements.Statement(None, None, ast)
         return elements.Statement(ast['var'], ast['oper'], ast['ex'])
 
+    def return_statement(self, ast):
+        return elements.ReturnStatement(ast['ex'])
+
     def program(self, ast):
         return elements.Program(ast)
 
