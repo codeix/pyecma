@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.108.12.39.22'
+__version__ = '14.108.14.38.48'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -425,7 +425,12 @@ class EcmaParser(Parser):
 
     @rule_def
     def _T_STRING_(self):
-        self._pattern(r'(?:".*")|(?:\'.*\')')
+        with self._choice():
+            with self._option():
+                self._pattern(r'".*"')
+            with self._option():
+                self._pattern(r"'.*'")
+            self._error('expecting one of: ".*" \'.*\'')
 
     @rule_def
     def _OPERATORS_(self):
@@ -451,6 +456,8 @@ class EcmaParser(Parser):
     @rule_def
     def _ASSIGN_OPERATORS_(self):
         with self._choice():
+            with self._option():
+                self._P_ASSIGN_()
             with self._option():
                 self._P_ASSIGN_PLUS_()
             with self._option():
@@ -518,6 +525,8 @@ class EcmaParser(Parser):
                 self._T_BOOL_()
             with self._option():
                 self._T_STRING_()
+            with self._option():
+                self._L_VARIABLE_()
             self._error('no available options')
 
     @rule_def
@@ -546,12 +555,7 @@ class EcmaParser(Parser):
                 with self._optional():
                     self._L_WS_()
                 with self._group():
-                    with self._choice():
-                        with self._option():
-                            self._T_NUMBER_()
-                        with self._option():
-                            self._L_VARIABLE_()
-                        self._error('no available options')
+                    self._TYPES_()
                 with self._optional():
                     self._L_WS_()
             with self._option():
@@ -609,7 +613,7 @@ class EcmaParser(Parser):
         with self._optional():
             self._L_WS_()
         with self._group():
-            self._P_ASSIGN_()
+            self._ASSIGN_OPERATORS_()
         self.ast['oper'] = self.last_node
         with self._group():
             self._expression_()

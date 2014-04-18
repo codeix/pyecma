@@ -1,3 +1,4 @@
+from pyecma import types
 from pyecma import parser
 from pyecma import elements
 
@@ -51,7 +52,11 @@ class EcmaSemantics(parser.EcmaSemantics):
         return None
 
     def T_NUMBER(self, ast):
-        return elements.Number(ast)
+        return types.Number(ast)
+
+    def T_STRING(self, ast):
+        trim = ast[:-1][1:]
+        return types.String(trim)
 
     def P_STAT_TERMINATOR(self, ast):
         return None
@@ -81,38 +86,38 @@ class EcmaSemantics(parser.EcmaSemantics):
         return elements.Operator(lambda x,y: x/y, '/')
 
     def P_ASSIGN(self, ast):
-        return elements.Operator(lambda x,y: y, '=')
+        return elements.AssignSimple()
 
     def P_ASSIGN_PLUS(self, ast):
-        return elements.Operator(lambda x,y: x+y, '+')
+        return elements.Assign(lambda x,y: x+y, '+')
 
     def P_ASSIGN_MINUS(self, ast):
-        return elements.Operator(lambda x,y: x-y, '-')
+        return elements.Assign(lambda x,y: x-y, '-')
 
     def P_ASSIGN_MULTIPLY(self, ast):
-        return elements.Operator(lambda x,y: x*y, '*')
+        return elements.Assign(lambda x,y: x*y, '*')
 
     def P_ASSIGN_DIVIDE(self, ast):
-        return elements.Operator(lambda x,y: x/y, '/')
+        return elements.Assign(lambda x,y: x/y, '/')
 
     def P_ASSIGN_MODULO(self, ast):
-        return elements.Operator(lambda x,y: x%y, '%')
+        return elements.Assign(lambda x,y: x%y, '%')
 
     def P_ASSIGN_BITWISE_LEFT(self, ast):
-        return elements.Operator(lambda x,y: x<<y, '<<')
+        return elements.Assign(lambda x,y: x<<y, '<<', True)
 
     def P_ASSIGN_BITWISE_RIGHT(self, ast):
-        return elements.Operator(lambda x,y: x>>y, '>>')
+        return elements.Assign(lambda x,y: x>>y, '>>', True)
 
     def P_ASSIGN_BITWISE_RIGHT_UNSIG(self, ast):
-        return elements.Operator(lambda x,y: (2**32-x) >> y, '>>>')
+        return elements.Assign(lambda x,y: (2**32-x) >> y, '>>>', True)
 
     def P_ASSIGN_BITWISE_AND(self, ast):
-        return elements.Operator(lambda x,y: x&y, '&')
+        return elements.Assign(lambda x,y: x&y, '&', True)
 
     def P_ASSIGN_BITWISE_OR(self, ast):
-        return elements.Operator(lambda x,y: x|y, '|')
+        return elements.Assign(lambda x,y: x|y, '|', True)
 
     def P_ASSIGN_BITWISE_XOR(self, ast):
-        return elements.Operator(lambda x,y: x^y, '^')
+        return elements.Assign(lambda x,y: x^y, '^', True)
 

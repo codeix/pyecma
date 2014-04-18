@@ -1,5 +1,5 @@
+from pyecma import types
 from pyecma import exceptions
-
 
 
 class Scope(dict):
@@ -29,9 +29,10 @@ class Scope(dict):
         try:
             return self[variable]
         except exceptions.ReferenceError:
-            return Undefinded()
+            return types.Undefinded()
 
     def __getitem__(self, variable):
+        variable = str(variable)
         if not variable in self:
             if self.parent is None:
                 raise exceptions.ReferenceError('%s is not defined' % variable)
@@ -64,15 +65,40 @@ class Operator(object):
 
     name = ''
 
-    def __init__(self, func, name):
+    def __init__(self, func, name, parseint=False):
         self.func = func
         self.name = name
+        self.parseint = parseint
 
     def __call__(self, scope, x, y):
-        return Number(self.func(x(scope), y(scope)))
-
+        _class, x, y = self.autocasting(x(scope), y(scope))
+        if self.parseint:
+            try:
+                return _class(self.func(int(x), int(y)))
+            except TypeError:
+                return types.Number(0)
+        try:
+            return _class(self.func(x, y))
+        except TypeError:
+            return types.NaN()
+        
     def __repr__(self):
         return '<ECMAScript Operator a%sb>' % self.name
+    
+    def autocasting(self, x, y):
+        if (isinstance(x, (types.String, types.Undefinded,)) or
+            isinstance(y, (types.String, types.Undefinded,))):
+            return types.String, types.String(str(x)), types.String(str(y))
+        return types.Number, self.cast(x), self.cast(y)
+    
+    def cast(self, v):
+        if isinstance(v, types.Bool):
+            return types.Number(v and 1 or 0)
+        elif isinstance(v, types.Null):
+            return types.Number(0)
+        else:
+            return v
+
 
 
 class Assign(Operator):
@@ -80,6 +106,14 @@ class Assign(Operator):
     def __repr__(self):
         return '<ECMAScript Assign x=%sb>' % self.name
 
+    def autocasting(self, x, y):
+        return y.__class__, x, y
+
+
+class AssignSimple(Assign):
+
+    def __init__(self):
+        super(AssignSimple, self).__init__(lambda x,y: y, '=')
 
 class Statement(object):
     
@@ -90,7 +124,7 @@ class Statement(object):
         
     def __call__(self, scope):
         if self.expression is None:
-            scope.set(self.variable, Undefinded())
+            scope.set(self.variable, types.Undefinded())
         elif self.assign is None:
             self.expression(scope)
         else:
@@ -118,7 +152,7 @@ class Function(object):
             if len(args) > index:
                 scope.create(name, self.cast(args[index]))
             else:
-                scope.create(name, Undefinded())
+                scope.create(name, types.Undefinded())
         scope.create('arguments', [self.cast(a) for a in args])
         self.code.run(scope)
         
@@ -148,9 +182,9 @@ class Expression(object):
             scope = Scope(None)
         ex = [i for i in self.ast if not isinstance(i, list) or len(i)]
         if len(ex) is 1:
-            return Number(ex[0](scope))
+            return ex[0](scope)
         init, part = ex
-        return Number(self.cal(scope, init(scope), part))
+        return self.cal(scope, init(scope), part)
         
         
     def cal(self, scope, init, part):
@@ -167,21 +201,6 @@ class Expression(object):
     def __repr__(self):
         return '<ECMAScript Expression <%s>>' % self.ast
 
-
-class Number(float):
-    def __call__(self, scope):
-        return self
-    
-    def __repr__(self):
-        return '<ECMAScript Number <%s>>' % super(Number, self).__repr__()
-
-
-class String(str):
-    def __call__(self, scope):
-        return self
-    
-    def __repr__(self):
-        return '<ECMAScript String <%s>>' % super(String, self).__repr__()
 
 
 class Variable(object):
@@ -200,11 +219,3 @@ class Variable(object):
     def __repr__(self):
         return '<ECMAScript Variable <%s>>' % self.name
 
-
-class Undefinded(object):
-
-    def __call__(self, scope):
-        return self
-
-    def __repr__(self):
-        return '<ECMAScript undefinded>'

@@ -93,28 +93,28 @@ T_NUMBER = ?/[\+-]?[0-9]+(?:\.[0-9]*)?(?:[eE][-\+]?[0-9])?/? ;
 T_UNDEFINED = ?/undefined/? ;
 T_NULL = ?/null/? ;
 T_BOOL = ?/true|false/? ;
-T_STRING = ?/(?:".*")|(?:'.*')/? ;
+T_STRING = ?/".*"/?|?/'.*'/? ;
 
 (* Grammar Groups *)
 OPERATORS = P_MINUS | P_PLUS | P_MULTIPLY | P_MODULO | P_DIVIDE | P_BITWISE_LEFT | P_BITWISE_RIGHT | P_BITWISE_RIGHT_UNSIG ;
-ASSIGN_OPERATORS = P_ASSIGN_PLUS | P_ASSIGN_MINUS | P_ASSIGN_MULTIPLY | P_ASSIGN_DIVIDE | P_ASSIGN_MODULO | P_ASSIGN_BITWISE_LEFT |
+ASSIGN_OPERATORS = P_ASSIGN | P_ASSIGN_PLUS | P_ASSIGN_MINUS | P_ASSIGN_MULTIPLY | P_ASSIGN_DIVIDE | P_ASSIGN_MODULO | P_ASSIGN_BITWISE_LEFT |
                    P_ASSIGN_BITWISE_RIGHT | P_ASSIGN_BITWISE_RIGHT_UNSIG | P_ASSIGN_BITWISE_AND | P_ASSIGN_BITWISE_OR | P_ASSIGN_BITWISE_XOR ;
 CREMENT_OPERATORS = P_PLUS_INC | P_MINUS_INC ;
 COMPARE_OPERATORS = P_LT | P_GT | P_LTE | P_GTE | P_EQUAL | P_NOT_EQUAL | P_E_EQUAL | P_E_NOT_EQUAL ;
-TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING ;
+TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
 
 
 (* Grammar *)
 
 (* http://www.boost.org/doc/libs/1_54_0/libs/spirit/classic/doc/introduction.html *)
 expression  = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
-factor      = [L_WS] (T_NUMBER | L_VARIABLE) [L_WS] | group ;
+factor      = [L_WS] (TYPES) [L_WS] | group ;
 term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
 group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
 
 
 program         = {function | statement} ;
-assign          = var:(variable_create | variable_set) [L_WS] oper:(P_ASSIGN) ex:(expression) [L_WS] P_STAT_TERMINATOR ;
+assign          = var:(variable_create | variable_set) [L_WS] oper:(ASSIGN_OPERATORS) ex:(expression) [L_WS] P_STAT_TERMINATOR ;
 statement       = assign | (expression [L_WS] P_STAT_TERMINATOR ) ;
 variable_create = K_VAR L_WS L_VARIABLE [L_WS] ;
 variable_set    = L_VARIABLE [L_WS] ;

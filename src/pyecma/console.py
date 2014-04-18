@@ -7,16 +7,23 @@ js = """
 var i = 1+1+(2*4)+(3)*3+222*(((4)));
 var j = 5;
 
+j += 1;
+j >>= 1;
+
+
+var hello = "Hello";
+hello += ' World';
+
 var x = j + i;
 
 
-var myfunc = function (arg, arg1){
+var myfunc = function (){
     var j= 8*8;
     i = j;
 }
 
-function secfunc (){
-    i=1+1;
+function secfunc (arg){
+    i=arg;
 }
 """
 
