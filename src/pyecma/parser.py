@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.109.01.54.57'
+__version__ = '14.109.10.35.45'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -531,17 +531,11 @@ class EcmaParser(Parser):
 
     @rule_def
     def _expression_(self):
-        with self._group():
-            with self._choice():
-                with self._option():
-                    self._callable_()
-                with self._option():
-                    self._calculation_()
-                self._error('no available options')
+        self._calculation_()
         self.ast['cal'] = self.last_node
-        def block3():
+        def block2():
             self._compare_()
-        self._closure(block3)
+        self._closure(block2)
         self.ast['comp'] = self.last_node
 
     @rule_def
@@ -583,7 +577,12 @@ class EcmaParser(Parser):
                 with self._optional():
                     self._L_WS_()
                 with self._group():
-                    self._TYPES_()
+                    with self._choice():
+                        with self._option():
+                            self._callable_()
+                        with self._option():
+                            self._TYPES_()
+                        self._error('no available options')
                 with self._optional():
                     self._L_WS_()
             with self._option():
@@ -620,15 +619,19 @@ class EcmaParser(Parser):
     @rule_def
     def _program_(self):
         def block0():
-            with self._choice():
-                with self._option():
-                    self._ifstatement_()
-                with self._option():
-                    self._function_()
-                with self._option():
-                    self._statement_()
-                self._error('no available options')
+            self._program_basics_()
         self._closure(block0)
+
+    @rule_def
+    def _program_basics_(self):
+        with self._choice():
+            with self._option():
+                self._ifstatement_()
+            with self._option():
+                self._function_()
+            with self._option():
+                self._statement_()
+            self._error('no available options')
 
     @rule_def
     def _assign_(self):
@@ -689,7 +692,7 @@ class EcmaParser(Parser):
                 with self._option():
                     self._return_statement_()
                 with self._option():
-                    self._statement_()
+                    self._program_basics_()
                 self._error('no available options')
         self._closure(block0)
         with self._optional():
@@ -788,16 +791,20 @@ class EcmaParser(Parser):
         with self._group():
             with self._optional():
                 self._L_WS_()
-            def block0():
+            with self._optional():
                 self._expression_()
+            with self._optional():
+                self._L_WS_()
+            def block0():
                 with self._optional():
                     self._L_WS_()
                 self._P_ARGS_DELIMITER_()
                 with self._optional():
                     self._L_WS_()
-            self._closure(block0)
-            with self._optional():
                 self._expression_()
+                with self._optional():
+                    self._L_WS_()
+            self._closure(block0)
             with self._optional():
                 self._L_WS_()
 
@@ -1150,6 +1157,9 @@ class EcmaSemantics(object):
         return ast
 
     def program(self, ast):
+        return ast
+
+    def program_basics(self, ast):
         return ast
 
     def assign(self, ast):

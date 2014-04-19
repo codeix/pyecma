@@ -179,10 +179,10 @@ class IfStatement(Statement):
 
     def __call__(self, scope):
         if self.expression(scope):
-            self.ifblock.run(scope)
+            return self.ifblock.run(scope)
         else:
             if self.elseblock is not None:
-                self.elseblock.run(scope)
+                return self.elseblock.run(scope)
 
 
 class ReturnStatement(Statement):

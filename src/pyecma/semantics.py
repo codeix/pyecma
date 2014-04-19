@@ -29,7 +29,10 @@ class EcmaSemantics(parser.EcmaSemantics):
         return elements.ReturnStatement(ast.ex)
 
     def ifstatement(self, ast):
-        return elements.IfStatement(ast.ex, ast.if_, ast.else_.else_)
+        else_ = None
+        if ast.else_:
+            else_ = ast.else_.else_
+        return elements.IfStatement(ast.ex, ast.if_, else_)
 
     def program(self, ast):
         return elements.Program(ast)
@@ -43,7 +46,7 @@ class EcmaSemantics(parser.EcmaSemantics):
 
     def callable(self, ast):
         if len(ast.params) == 2:
-            params = ast.params[0] + [ast.params[1]]
+            params = ast.params[1] + [ast.params[0]]
         else:
             params = ast.params
         return elements.Callable(ast.name, params)
@@ -79,8 +82,8 @@ class EcmaSemantics(parser.EcmaSemantics):
 
     def T_STRING(self, ast):
         trim = ast[:-1][1:]
-        trim.replace(r"\'", "'")
-        trim.replace(r'\"', '"')
+        trim = trim.replace(r"\'", "'")
+        trim = trim.replace(r'\"', '"')
         return types.String(trim)
 
     def P_STAT_TERMINATOR(self, ast):

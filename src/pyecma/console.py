@@ -4,7 +4,6 @@ from pyecma.parser import EcmaParser
 js = r"""
 
 
-
 var iftest= 'iftest';
 
 if (1*0) {
@@ -53,22 +52,29 @@ function multi (arg1, arg2){
     return arg1 * arg2 ;
 }
 
-
 var myecho = echo('it\'s works :-)');
 
-
-function recursion(){
-
+function factorial (fac){
+  if(fac > 1){
+      return fac * factorial(fac-1);
+  } else {
+  
+    return fac;
+  }
 }
 
+
+
 """
+
+
+
 
 def run():
     parser = EcmaParser()
     app=parser.parse(js, 'program', semantics=EcmaSemantics())
-    app.echo('blup')
+    app.factorial(3)
     import pdb; pdb.set_trace()
-    app.i
     
     
     
