@@ -185,6 +185,32 @@ class IfStatement(Statement):
                 return self.elseblock.run(scope)
 
 
+class WhileStatement(Statement):
+    
+    def __init__(self, expression, codeblock):
+        self.expression = expression
+        self.codeblock = codeblock
+        
+    def __call__(self, scope):
+        scope = Scope(scope)
+        while self.expression(scope):
+            re = self.codeblock.run(scope)
+            if re is not None:
+                return re
+
+
+class DoWhileStatement(WhileStatement):
+
+    def __call__(self, scope):
+        scope = Scope(scope)
+        while True:
+            re = self.codeblock.run(scope)
+            if re is not None:
+                return re
+            if not self.expression(scope):
+                break
+
+
 class ReturnStatement(Statement):
     
     def __init__(self, expression):

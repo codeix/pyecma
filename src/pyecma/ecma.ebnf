@@ -116,14 +116,15 @@ group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
 
 
 program         = {program_basics} ;
-program_basics  = ifstatement | function | statement ;
+program_basics  = ifstatement | whilestatement | dowhilestatement | function | statement ;
+program_common  = return_statement | program_basics ;  (* common statments used in IF, FOR WHILE loops*)
 assign          = var:(variable_create | variable_set) [L_WS] oper:(ASSIGN_OPERATORS) ex:(expression) [L_WS] P_STAT_TERMINATOR ;
 statement       = assign | (expression [L_WS] P_STAT_TERMINATOR ) ;
 variable_create = K_VAR L_WS L_VARIABLE [L_WS] ;
 variable_set    = L_VARIABLE [L_WS] ;
 
 
-code_block       = P_SCB [L_WS] {return_statement | program_basics} [L_WS] P_ECB ;
+code_block       = P_SCB [L_WS] {program_common} [L_WS] P_ECB ;
 return_statement = K_RETURN [L_WS] (ex:expression [L_WS] P_STAT_TERMINATOR) ;
 arguments        = ([L_WS] {L_VARIABLE [L_WS] P_ARGS_DELIMITER [L_WS]} [L_VARIABLE] [L_WS]) ;
 function         = function_classic | function_assign ;
@@ -136,9 +137,14 @@ parameters      = ([L_WS] [expression] [L_WS] { [L_WS] P_ARGS_DELIMITER [L_WS] e
 callable        = name:L_VARIABLE [L_WS] P_S_FUNC_DELI [L_WS] params:parameters [L_WS] P_E_FUNC_DELI ;
 
 
-code_singleline = (return_statement | statement) | code_block;
+code_singleline = (program_common) | code_block;
 ifstatement     = K_IF [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] if:code_singleline else:[elsestatement] ;
 elsestatement   = [L_WS] K_ELSE else:code_singleline ;
+
+
+whilestatement   = K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] code:code_singleline ;
+dowhilestatement = K_DO [L_WS] code:code_block [L_WS] K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] P_STAT_TERMINATOR [L_WS];
+
 
 (* Entry Points *)
 

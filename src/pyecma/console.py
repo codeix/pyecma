@@ -3,6 +3,22 @@ from pyecma.parser import EcmaParser
 
 js = r"""
 
+function abs(value){
+    if (value < 0)
+        return value * -1;
+    return value;
+}
+
+function ggt(e, f) {
+    while (abs(e - f) > 0) {
+        if ( e < f )
+             f = f - e;
+        else
+             e = e - f;
+    }
+    return e;
+}
+
 
 var iftest= 'iftest';
 
@@ -55,14 +71,20 @@ function multi (arg1, arg2){
 var myecho = echo('it\'s works :-)');
 
 function factorial (fac){
-  if(fac > 1){
+  if(fac > 1)
       return fac * factorial(fac-1);
-  } else {
-  
+  else
     return fac;
-  }
 }
 
+function dofactorial(counter){
+    var result = 1;
+    do {
+        result *= counter;
+        counter -= 1;
+    } while (counter > 0);
+    return result;
+}
 
 
 """
@@ -73,7 +95,7 @@ function factorial (fac){
 def run():
     parser = EcmaParser()
     app=parser.parse(js, 'program', semantics=EcmaSemantics())
-    app.factorial(3)
+    app.dofactorial(3)
     import pdb; pdb.set_trace()
     
     

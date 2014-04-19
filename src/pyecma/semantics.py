@@ -33,6 +33,12 @@ class EcmaSemantics(parser.EcmaSemantics):
         if ast.else_:
             else_ = ast.else_.else_
         return elements.IfStatement(ast.ex, ast.if_, else_)
+    
+    def whilestatement(self, ast):
+        return elements.WhileStatement(ast.ex, ast.code)
+
+    def dowhilestatement(self, ast):
+        return elements.DoWhileStatement(ast.ex, ast.code)
 
     def program(self, ast):
         return elements.Program(ast)

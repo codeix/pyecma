@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.109.10.35.45'
+__version__ = '14.109.12.29.26'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -628,9 +628,22 @@ class EcmaParser(Parser):
             with self._option():
                 self._ifstatement_()
             with self._option():
+                self._whilestatement_()
+            with self._option():
+                self._dowhilestatement_()
+            with self._option():
                 self._function_()
             with self._option():
                 self._statement_()
+            self._error('no available options')
+
+    @rule_def
+    def _program_common_(self):
+        with self._choice():
+            with self._option():
+                self._return_statement_()
+            with self._option():
+                self._program_basics_()
             self._error('no available options')
 
     @rule_def
@@ -688,12 +701,7 @@ class EcmaParser(Parser):
         with self._optional():
             self._L_WS_()
         def block0():
-            with self._choice():
-                with self._option():
-                    self._return_statement_()
-                with self._option():
-                    self._program_basics_()
-                self._error('no available options')
+            self._program_common_()
         self._closure(block0)
         with self._optional():
             self._L_WS_()
@@ -828,12 +836,7 @@ class EcmaParser(Parser):
         with self._choice():
             with self._option():
                 with self._group():
-                    with self._choice():
-                        with self._option():
-                            self._return_statement_()
-                        with self._option():
-                            self._statement_()
-                        self._error('no available options')
+                    self._program_common_()
             with self._option():
                 self._code_block_()
             self._error('no available options')
@@ -866,6 +869,50 @@ class EcmaParser(Parser):
         self._K_ELSE_()
         self._code_singleline_()
         self.ast['else_'] = self.last_node
+
+    @rule_def
+    def _whilestatement_(self):
+        self._K_WHILE_()
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._expression_()
+        self.ast['ex'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._code_singleline_()
+        self.ast['code'] = self.last_node
+
+    @rule_def
+    def _dowhilestatement_(self):
+        self._K_DO_()
+        with self._optional():
+            self._L_WS_()
+        self._code_block_()
+        self.ast['code'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._K_WHILE_()
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._expression_()
+        self.ast['ex'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._P_STAT_TERMINATOR_()
+        with self._optional():
+            self._L_WS_()
 
 
 
@@ -1162,6 +1209,9 @@ class EcmaSemantics(object):
     def program_basics(self, ast):
         return ast
 
+    def program_common(self, ast):
+        return ast
+
     def assign(self, ast):
         return ast
 
@@ -1208,6 +1258,12 @@ class EcmaSemantics(object):
         return ast
 
     def elsestatement(self, ast):
+        return ast
+
+    def whilestatement(self, ast):
+        return ast
+
+    def dowhilestatement(self, ast):
         return ast
 
 def main(filename, startrule, trace=False):
