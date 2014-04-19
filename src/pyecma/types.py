@@ -48,3 +48,4 @@ class Null(AbstractType):
     def __repr__(self):
         return '<ECMAScript Null>'
 
+

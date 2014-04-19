@@ -1,50 +1,14 @@
 from pyecma import types
 from pyecma import exceptions
-
-
-class Scope(dict):
-    
-    parent = None
-    
-    def __init__(self, parent):
-        self.parent = parent
-    
-    def __setitem__(self, variable, value):
-        create = isinstance(variable, Variable) and variable.create
-        if str(variable) in self or self.parent is None or create:
-            super(Scope, self).__setitem__(str(variable), value)
-        else:
-            self.parent[variable] = value
-
-    def create(self, variable, value):
-        super(Scope, self).__setitem__(str(variable), value)
-
-    def setglobal(self, variable, value):
-        if self.parent is None:
-            self[variable] = value
-        else:
-            self.parent.set_global(variable, value)
-
-    def get(self, variable):
-        try:
-            return self[variable]
-        except exceptions.ReferenceError:
-            return types.Undefinded()
-
-    def __getitem__(self, variable):
-        variable = str(variable)
-        if not variable in self:
-            if self.parent is None:
-                raise exceptions.ReferenceError('%s is not defined' % variable)
-            else:
-                return self.parent[variable]
-        return super(Scope, self).__getitem__(variable)
+from pyecma.scope import Scope
+from pyecma.scope import GlobalScope
+from pyecma.builtins import AbstractFunction
 
 
 class Program(object):
 
     def __init__(self, ast):
-        self.__dict__ = Scope(Scope(None))
+        self.__dict__ = Scope(Scope(GlobalScope()))
         self.run(ast, self.__dict__)
 
     def run(self, statements, scope):
@@ -229,7 +193,7 @@ class BreakStatement(ReturnStatement):
         return types.Undefinded()
 
 
-class Function(object):
+class Function(AbstractFunction):
     
     def __init__(self, ast):
         self.name = ast['name']
@@ -240,27 +204,12 @@ class Function(object):
         self.signatur = sign
     
     def __call__(self, *args):
-        scope = Scope(self.scope)
-        for index, name in enumerate(self.signatur):
-            if len(args) > index:
-                scope.create(name, self.cast(args[index]))
-            else:
-                scope.create(name, types.Undefinded())
-        scope.create('arguments', [self.cast(a) for a in args])
-        return self.code.run(scope)
-        
-    def cast(self, value):
-        if isinstance(value, str):
-            return types.String(value)
-        elif isinstance(value, (int, float,)):
-            return types.Number(value)
-        else:
-            raise exceptions.ArgumentError('type was recognize for %s' % value)
+        return self.code.run(self.createscope(args, self.scope))
 
     def prepare(self, scope):
         self.scope = scope
         scope[self.name] = self
-    
+
     def __repr__(self):
         return '<ECMAScript Function %s>' % self.name
 
@@ -303,9 +252,26 @@ class Callable(object):
 
     def __call__(self, scope):
         function = scope[self.name]
-        if not isinstance(function, Function):
+        if not isinstance(function, AbstractFunction):
             raise exceptions.TypeError('%s is not a function' % type(function))
         return function(*[p(scope) for p in self.params])
+
+
+class Variable(object):
+    
+    create = False
+    
+    def __init__(self, name):
+        self.name = name
+
+    def __call__(self, scope):
+        return scope[self.name]
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<ECMAScript Variable <%s>>' % self.name
 
 
 class Expression(object):
@@ -324,19 +290,5 @@ class Expression(object):
         return '<ECMAScript Expression <%s %s>>' % (self.calculation, self.compares,)
 
 
-class Variable(object):
-    
-    create = False
-    
-    def __init__(self, name):
-        self.name = name
 
-    def __call__(self, scope):
-        return scope[self.name]
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return '<ECMAScript Variable <%s>>' % self.name
 
