@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.108.17.04.48'
+__version__ = '14.109.01.54.57'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -427,10 +427,10 @@ class EcmaParser(Parser):
     def _T_STRING_(self):
         with self._choice():
             with self._option():
-                self._pattern(r'".*"')
+                self._pattern(r'"(?:\\"|[^";])*"')
             with self._option():
-                self._pattern(r"'.*'")
-            self._error('expecting one of: \'.*\' ".*"')
+                self._pattern(r"'(?:\\'|[^';])*'")
+            self._error('expecting one of: "(?:\\"|[^";])*" \'(?:\\\'|[^\';])*\'')
 
     @rule_def
     def _OPERATORS_(self):
@@ -531,6 +531,34 @@ class EcmaParser(Parser):
 
     @rule_def
     def _expression_(self):
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._callable_()
+                with self._option():
+                    self._calculation_()
+                self._error('no available options')
+        self.ast['cal'] = self.last_node
+        def block3():
+            self._compare_()
+        self._closure(block3)
+        self.ast['comp'] = self.last_node
+
+    @rule_def
+    def _compare_(self):
+        with self._optional():
+            self._L_WS_()
+        self._COMPARE_OPERATORS_()
+        self.ast['op'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._calculation_()
+        self.ast['cal'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+
+    @rule_def
+    def _calculation_(self):
         self._term_()
         self._cut()
         def block0():
@@ -593,6 +621,8 @@ class EcmaParser(Parser):
     def _program_(self):
         def block0():
             with self._choice():
+                with self._option():
+                    self._ifstatement_()
                 with self._option():
                     self._function_()
                 with self._option():
@@ -752,6 +782,83 @@ class EcmaParser(Parser):
             self._L_WS_()
         self._code_block_()
         self.ast['code'] = self.last_node
+
+    @rule_def
+    def _parameters_(self):
+        with self._group():
+            with self._optional():
+                self._L_WS_()
+            def block0():
+                self._expression_()
+                with self._optional():
+                    self._L_WS_()
+                self._P_ARGS_DELIMITER_()
+                with self._optional():
+                    self._L_WS_()
+            self._closure(block0)
+            with self._optional():
+                self._expression_()
+            with self._optional():
+                self._L_WS_()
+
+    @rule_def
+    def _callable_(self):
+        self._L_VARIABLE_()
+        self.ast['name'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._parameters_()
+        self.ast['params'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+
+    @rule_def
+    def _code_singleline_(self):
+        with self._choice():
+            with self._option():
+                with self._group():
+                    with self._choice():
+                        with self._option():
+                            self._return_statement_()
+                        with self._option():
+                            self._statement_()
+                        self._error('no available options')
+            with self._option():
+                self._code_block_()
+            self._error('no available options')
+
+    @rule_def
+    def _ifstatement_(self):
+        self._K_IF_()
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._expression_()
+        self.ast['ex'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._code_singleline_()
+        self.ast['if_'] = self.last_node
+        with self._optional():
+            self._elsestatement_()
+        self.ast['else_'] = self.last_node
+
+    @rule_def
+    def _elsestatement_(self):
+        with self._optional():
+            self._L_WS_()
+        self._K_ELSE_()
+        self._code_singleline_()
+        self.ast['else_'] = self.last_node
 
 
 
@@ -1027,6 +1134,12 @@ class EcmaSemantics(object):
     def expression(self, ast):
         return ast
 
+    def compare(self, ast):
+        return ast
+
+    def calculation(self, ast):
+        return ast
+
     def factor(self, ast):
         return ast
 
@@ -1070,6 +1183,21 @@ class EcmaSemantics(object):
         return ast
 
     def function_body(self, ast):
+        return ast
+
+    def parameters(self, ast):
+        return ast
+
+    def callable(self, ast):
+        return ast
+
+    def code_singleline(self, ast):
+        return ast
+
+    def ifstatement(self, ast):
+        return ast
+
+    def elsestatement(self, ast):
         return ast
 
 def main(filename, startrule, trace=False):

@@ -103,12 +103,10 @@ class Operator(object):
             return v
 
 
-
 class Assign(Operator):
 
     def __repr__(self):
         return '<ECMAScript Assign x=%sb>' % self.name
-
 
 
 class AssignSimple(Assign):
@@ -118,6 +116,37 @@ class AssignSimple(Assign):
 
     def autocasting(self, x, y):
         return y.__class__, x, y
+
+
+class Compare(Operator):
+
+    def __init__(self, func, name, checktype=False):
+        self.checktype = checktype
+        super(Compare, self).__init__(func, name)
+
+    def __repr__(self):
+        return '<ECMAScript Compare x%sb>' % self.name
+
+    def __call__(self, scope, x, y):
+        if self.checktype:
+            if type(x) == type(y):
+                return types.Bool(True)
+            else:
+                return types.Bool(False)
+
+        if (isinstance(x, types.String) + isinstance(y, types.String)) == 1:
+            return types.Bool(False)
+
+        if isinstance(y, types.String) and isinstance(x, types.String):
+            return types.Bool(self.func(x, y))
+
+        if not isinstance(x, types.Number):
+            x = types.Number(x)
+
+        if not isinstance(y, types.Number):
+            y = types.Number(y)
+        
+        return types.Bool(self.func(x, y))
 
 
 class Statement(object):
@@ -139,6 +168,21 @@ class Statement(object):
 
     def prepare(self, scope):
         return self(scope)
+
+
+class IfStatement(Statement):
+    
+    def __init__(self, expression, ifblock, elseblock):
+        self.expression = expression
+        self.ifblock = ifblock
+        self.elseblock = elseblock
+
+    def __call__(self, scope):
+        if self.expression(scope):
+            self.ifblock.run(scope)
+        else:
+            if self.elseblock is not None:
+                self.elseblock.run(scope)
 
 
 class ReturnStatement(Statement):
@@ -176,7 +220,7 @@ class Function(object):
         elif isinstance(value, (int, float,)):
             return types.Number(value)
         else:
-            raise ArgumentError('type was recognize for %s' % arg)
+            raise exceptions.ArgumentError('type was recognize for %s' % value)
 
     def prepare(self, scope):
         self.scope = scope
@@ -186,7 +230,7 @@ class Function(object):
         return '<ECMAScript Function %s>' % self.name
 
 
-class Expression(object):
+class Calculation(object):
     
     def __init__(self, ast):
         self.ast = ast
@@ -213,8 +257,36 @@ class Expression(object):
         return init
     
     def __repr__(self):
-        return '<ECMAScript Expression <%s>>' % self.ast
+        return '<ECMAScript Calculation <%s>>' % self.ast
 
+
+class Callable(object):
+    
+    def __init__(self, name, params):
+        self.name = name
+        self.params = params
+
+    def __call__(self, scope):
+        function = scope[self.name]
+        if not isinstance(function, Function):
+            raise exceptions.TypeError('%s is not a function' % type(function))
+        return function(*[p(scope) for p in self.params])
+
+
+class Expression(object):
+
+    def __init__(self, calculation, compares):
+        self.calculation = calculation
+        self.compares = compares
+    
+    def __call__(self, scope=None):
+        re = self.calculation(scope)
+        for comp in self.compares:
+            re = comp.op(scope, re, comp.cal(scope))
+        return re
+
+    def __repr__(self):
+        return '<ECMAScript Expression <%s %s>>' % (self.calculation, self.compares,)
 
 
 class Variable(object):

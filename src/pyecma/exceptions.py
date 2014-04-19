@@ -8,3 +8,7 @@ class ReferenceError(EcmaException):
 
 class ArgumentError(EcmaException):
     pass
+
+
+class TypeError(EcmaException):
+    pass

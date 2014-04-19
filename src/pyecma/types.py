@@ -19,16 +19,16 @@ class String(str, AbstractType):
 
 class Bool(int, AbstractType):
 
-    def __init__(self, value):
+    def __new__(cls, value):
         if isinstance(value, str):
             if value == 'true':
                 value = True
             else:
                 value = False
-        super(Bool, self).__init__(value)
+        return super(Bool, cls).__new__(cls, value)
 
     def __repr__(self):
-        return '<ECMAScript Bool <%s>>' % self and 'True' or 'False'
+        return '<ECMAScript Bool <%s>>' % (self and 'True' or 'False')
 
 
 class Undefinded(AbstractType):

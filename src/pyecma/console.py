@@ -1,9 +1,24 @@
 from pyecma.semantics import EcmaSemantics
 from pyecma.parser import EcmaParser
 
-js = """
+js = r"""
 
 
+
+var iftest= 'iftest';
+
+if (1*0) {
+    iftest += ' True';
+}else{
+    iftest += ' False';
+}
+
+
+
+var c = 1==1;
+var cc = 1==(1==0);
+
+var i = 1;
 var i = 1+1+(2*4)+(3)*3+222*(((4)));
 var j = 5;
 
@@ -30,9 +45,20 @@ function echo (arg){
     return arg ;
 }
 
+function self(){
+    return self;
+}
 
 function multi (arg1, arg2){
     return arg1 * arg2 ;
+}
+
+
+var myecho = echo('it\'s works :-)');
+
+
+function recursion(){
+
 }
 
 """

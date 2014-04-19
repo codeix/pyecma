@@ -6,7 +6,10 @@ from pyecma import elements
 class EcmaSemantics(parser.EcmaSemantics):
 
     def expression(self, ast):
-        return elements.Expression(ast)
+        return elements.Expression(ast.cal, ast.comp)
+
+    def calculation(self, ast):
+        return elements.Calculation(ast)
 
     def factor(self, ast):
         return ast
@@ -20,10 +23,13 @@ class EcmaSemantics(parser.EcmaSemantics):
     def statement(self, ast):
         if isinstance(ast, elements.Expression):
             return elements.Statement(None, None, ast)
-        return elements.Statement(ast['var'], ast['oper'], ast['ex'])
+        return elements.Statement(ast.var, ast.oper, ast.ex)
 
     def return_statement(self, ast):
-        return elements.ReturnStatement(ast['ex'])
+        return elements.ReturnStatement(ast.ex)
+
+    def ifstatement(self, ast):
+        return elements.IfStatement(ast.ex, ast.if_, ast.else_.else_)
 
     def program(self, ast):
         return elements.Program(ast)
@@ -32,11 +38,25 @@ class EcmaSemantics(parser.EcmaSemantics):
         return elements.Function(ast)
 
     def function_classic(self, ast):
-        ast['name'].create = True
+        ast.name.create = True
         return ast
+
+    def callable(self, ast):
+        if len(ast.params) == 2:
+            params = ast.params[0] + [ast.params[1]]
+        else:
+            params = ast.params
+        return elements.Callable(ast.name, params)
+
 
     def code_block(self, ast):
         return elements.CodeBlock(ast)
+
+    def code_singleline(self, ast):
+        if isinstance(ast, elements.CodeBlock):
+            return ast
+        return elements.CodeBlock([ast])
+        
 
     def variable_create(self, ast):
         ast.create = True
@@ -59,6 +79,8 @@ class EcmaSemantics(parser.EcmaSemantics):
 
     def T_STRING(self, ast):
         trim = ast[:-1][1:]
+        trim.replace(r"\'", "'")
+        trim.replace(r'\"', '"')
         return types.String(trim)
 
     def P_STAT_TERMINATOR(self, ast):
@@ -123,4 +145,28 @@ class EcmaSemantics(parser.EcmaSemantics):
 
     def P_ASSIGN_BITWISE_XOR(self, ast):
         return elements.Assign(lambda x,y: x^y, '^', True)
+
+    def P_LT(self, ast):
+        return elements.Compare(lambda x,y: x<y, '<')
+
+    def P_GT(self, ast):
+        return elements.Compare(lambda x,y: x>y, '>')
+
+    def P_LTE(self, ast):
+        return elements.Compare(lambda x,y: x<=y, '<=')
+
+    def P_GTE(self, ast):
+        return elements.Compare(lambda x,y: x>=y, '>=')
+
+    def P_EQUAL(self, ast):
+        return elements.Compare(lambda x,y: x==y, '==')
+
+    def P_NOT_EQUAL(self, ast):
+        return elements.Compare(lambda x,y: x!=y, '!=')
+
+    def P_E_EQUAL(self, ast):
+        return elements.Compare(lambda x,y: x==y, '===', True)
+
+    def P_E_NOT_EQUAL(self, ast):
+        return elements.Compare(lambda x,y: x!=y, '!==', True)
 

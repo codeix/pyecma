@@ -93,7 +93,7 @@ T_NUMBER = ?/[\+-]?[0-9]+(?:\.[0-9]*)?(?:[eE][-\+]?[0-9])?/? ;
 T_UNDEFINED = ?/undefined/? ;
 T_NULL = ?/null/? ;
 T_BOOL = ?/true|false/? ;
-T_STRING = ?/".*"/?|?/'.*'/? ;
+T_STRING = ?/"(?:\\"|[^";])*"/?|?/'(?:\\'|[^';])*'/? ;
 
 (* Grammar Groups *)
 OPERATORS = P_MINUS | P_PLUS | P_MULTIPLY | P_MODULO | P_DIVIDE | P_BITWISE_LEFT | P_BITWISE_RIGHT | P_BITWISE_RIGHT_UNSIG ;
@@ -107,13 +107,15 @@ TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
 (* Grammar *)
 
 (* http://www.boost.org/doc/libs/1_54_0/libs/spirit/classic/doc/introduction.html *)
-expression  = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
+expression  = cal:(callable | calculation) comp:{compare} ;
+compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
+calculation = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
 factor      = [L_WS] (TYPES) [L_WS] | group ;
 term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
 group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
 
 
-program         = {function | statement} ;
+program         = {ifstatement | function | statement} ;
 assign          = var:(variable_create | variable_set) [L_WS] oper:(ASSIGN_OPERATORS) ex:(expression) [L_WS] P_STAT_TERMINATOR ;
 statement       = assign | (expression [L_WS] P_STAT_TERMINATOR ) ;
 variable_create = K_VAR L_WS L_VARIABLE [L_WS] ;
@@ -127,6 +129,15 @@ function         = function_classic | function_assign ;
 function_classic = K_FUNCTION [L_WS] name:L_VARIABLE body:function_body;
 function_assign  = name:(variable_create | variable_set) [L_WS] P_ASSIGN [L_WS] K_FUNCTION [L_WS] body:function_body ;
 function_body    = [L_WS] P_S_FUNC_DELI [L_WS] sign:arguments [L_WS] P_E_FUNC_DELI [L_WS] code:code_block;
+
+
+parameters      = ([L_WS] {expression [L_WS] P_ARGS_DELIMITER [L_WS]} [expression] [L_WS]) ;
+callable        = name:L_VARIABLE [L_WS] P_S_FUNC_DELI [L_WS] params:parameters [L_WS] P_E_FUNC_DELI ;
+
+
+code_singleline = (return_statement | statement) | code_block;
+ifstatement     = K_IF [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] if:code_singleline else:[elsestatement] ;
+elsestatement   = [L_WS] K_ELSE else:code_singleline ;
 
 (* Entry Points *)
 
