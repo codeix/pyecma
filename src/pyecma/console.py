@@ -86,6 +86,13 @@ function dofactorial(counter){
     return result;
 }
 
+var br = 9;
+while (br){
+    if (br<5)
+        break;
+    br -= 1;
+}
+
 
 """
 

@@ -12,7 +12,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import * # @UnusedWildImport
 from grako.exceptions import * # @UnusedWildImport
 
-__version__ = '14.109.12.29.26'
+__version__ = '14.109.13.38.53'
 
 class EcmaParser(Parser):
     def __init__(self, whitespace=None, nameguard=True, **kwargs):
@@ -641,6 +641,8 @@ class EcmaParser(Parser):
     def _program_common_(self):
         with self._choice():
             with self._option():
+                self._break_statement_()
+            with self._option():
                 self._return_statement_()
             with self._option():
                 self._program_basics_()
@@ -718,6 +720,13 @@ class EcmaParser(Parser):
             with self._optional():
                 self._L_WS_()
             self._P_STAT_TERMINATOR_()
+
+    @rule_def
+    def _break_statement_(self):
+        self._K_BREAK_()
+        with self._optional():
+            self._L_WS_()
+        self._P_STAT_TERMINATOR_()
 
     @rule_def
     def _arguments_(self):
@@ -1228,6 +1237,9 @@ class EcmaSemantics(object):
         return ast
 
     def return_statement(self, ast):
+        return ast
+
+    def break_statement(self, ast):
         return ast
 
     def arguments(self, ast):

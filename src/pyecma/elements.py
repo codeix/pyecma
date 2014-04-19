@@ -220,6 +220,15 @@ class ReturnStatement(Statement):
         return self.expression(scope)
 
 
+class BreakStatement(ReturnStatement):
+
+    def __init__(self):
+        pass
+
+    def __call__(self, scope):
+        return types.Undefinded()
+
+
 class Function(object):
     
     def __init__(self, ast):
