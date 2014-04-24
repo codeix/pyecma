@@ -67,6 +67,23 @@ class Operator(object):
             return v
 
 
+class Increment(object):
+    
+    def __init__(self, operation, variable, pre=True):
+        self.operation = operation
+        self.variable = variable
+        self.pre = pre
+
+    def __call__(self, scope):
+        re = self.operation(scope, self.variable, types.Number(1))
+        old = scope[self.variable]
+        scope[self.variable] = re
+        if self.pre:
+            return re
+        else:
+            return old
+
+
 class Assign(Operator):
 
     def __repr__(self):
@@ -174,6 +191,86 @@ class DoWhileStatement(WhileStatement):
             if not self.expression(scope):
                 break
 
+
+class ForStatement(Statement):
+    
+    def __init__(self, variable, condition, expression, codeblock):
+        self.variable = variable
+        self.condition = condition
+        self.expression = expression
+        self.codeblock = codeblock
+    
+    def __call__(self, scope):
+        scope = Scope(scope)
+        if self.variable is not None:
+            self.variable(scope)
+        while True:
+            re = self.codeblock.run(scope)
+            if re is not None:
+                return re
+            if self.expression is not None:
+                self.expression(scope)
+            if self.condition is not None:
+                if not self.condition(scope):
+                    break
+
+
+class SwitchStatement(Statement):
+    
+    hasdefault = False
+    
+    def __init__(self, expression, cases):
+        self.expression = expression
+        self.cases = cases
+        c = len([i for i in cases if isinstance(i, SwitchCaseDefault)])
+        if c > 0:
+            self.hasdefault = True
+        if c > 1:
+            raise exceptions.SyntaxError('More than one default clause in switch statement')
+
+    def __call__(self, scope):
+        scope = Scope(scope)
+        comparevalue = self.expression(scope)
+        checkmatch = True
+        hasmatch = False
+        for index, case in enumerate(self.cases):
+            if isinstance(case, SwitchCase):
+                if not checkmatch or case.match(scope, comparevalue):
+                    re = case.run(scope)
+                    hasmatch = True
+                    if re is not None:
+                        return re
+                    else:
+                        checkmatch = False
+            if not hasmatch and index + 1 is len(self.cases) and self.hasdefault:
+                return case.run(scope)
+
+
+class SwitchCase(object):
+    
+    def __init__(self, expression, codeblock):
+        self.expression = expression
+        self.codeblock = codeblock
+        self.compare = Compare(lambda x,y: x==y, '=')
+    
+    def match(self, scope, value):
+        return self.compare(scope, value, self.expression(scope))
+    
+    def run(self, scope):
+        return self.codeblock.run(scope)
+
+
+class SwitchCaseDefault(object):
+    
+    def __init__(self, codeblock):
+        self.codeblock = codeblock
+    
+    def match(self, scope, value):
+        return True
+    
+    def run(self, scope):
+        return self.codeblock.run(scope)
+        
 
 class ReturnStatement(Statement):
     

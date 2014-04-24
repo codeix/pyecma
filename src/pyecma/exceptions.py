@@ -12,3 +12,7 @@ class ArgumentError(EcmaException):
 
 class TypeError(EcmaException):
     pass
+
+
+class SyntaxError(EcmaException):
+    pass

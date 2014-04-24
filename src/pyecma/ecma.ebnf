@@ -29,6 +29,10 @@ K_THROW = (?/throw/?) ;
 K_DELETE = (?/delete/?) ;
 K_IN = (?/in/?) ;
 K_TRY = (?/try/?) ;
+K_ALL = K_BREAK | K_DO | K_INSTANCEOF | K_TYPEOF | K_CASE | K_ELSE | K_NEW | K_VAR | K_CATCH | K_FINALLLY |
+        K_RETURN | K_VOID | K_CONTINUE | K_FOR | K_SWITCH | K_WHILE | K_DEBUGGER | K_FUNCTION | K_THIS | K_WITH | 
+        K_DEFAULT | K_IF | K_THROW | K_DELETE | K_IN | K_TRY ;
+
 
 
 (* P_ Punctuators 7.7 *)
@@ -80,10 +84,19 @@ P_ASSIGN_BITWISE_RIGHT_UNSIG = (?/>>>=/?) ;    (* Bitwise shift right (unsigned)
 P_ASSIGN_BITWISE_AND = (?/&=/?) ;    (* Bitwise AND and assign *)
 P_ASSIGN_BITWISE_OR = (?/\|=/?) ;    (* Bitwise OR and assign *)
 P_ASSIGN_BITWISE_XOR = (?/\^=/?) ;    (* Bitwise XOR and assign *)
+P_ALL = P_SCB | P_ECB | P_S_FUNC_DELI | P_E_FUNC_DELI | P_S_ARRAY_DELI | P_E_ARRAY_DELI | P_ACCESSOR | P_STAT_TERMINATOR |
+        P_ARGS_DELIMITER | P_LT | P_GT | P_LTE | P_GTE | P_EQUAL | P_NOT_EQUAL | P_E_EQUAL | P_E_NOT_EQUAL | P_PLUS | P_MINUS |
+        P_MULTIPLY | P_DIVIDE | P_MODULO | P_PLUS_INC | P_MINUS_INC | P_BITWISE_LEFT | P_BITWISE_RIGHT | P_BITWISE_RIGHT_UNSIG |
+        P_BITWISE_AND | P_BITWISE_OR | P_BITWISE_XOR | P_NOT | P_BITWISE_NOT | P_AND | P_OR | P_CONDITIONAL_OP 
+        P_PART_CONDITIONAL_OP | P_ASSIGN | P_ASSIGN_PLUS | P_ASSIGN_MINUS | P_ASSIGN_MULTIPLY | P_ASSIGN_DIVIDE |
+        P_ASSIGN_MODULO | P_ASSIGN_BITWISE_LEFT | P_ASSIGN_BITWISE_RIGHT | P_ASSIGN_BITWISE_RIGHT_UNSIG | P_ASSIGN_BITWISE_AND 
+        P_ASSIGN_BITWISE_OR | P_ASSIGN_BITWISE_XOR ;
+
 
 (* Language *)
 L_WS = ?/(?:\s+)/? ;
-L_VARIABLE = ?/((?:[A-z]+[0-9]*)+)/? ;
+L_VARIABLE_REG = ?/((?:[A-z]+[0-9]*)+)/? ;
+L_VARIABLE = !(K_ALL (L_WS | P_ALL)) L_VARIABLE_REG ;
 P_S_OPER_DELI = (?/\(/?) ;
 P_E_OPER_DELI = (?/\)/?) ;
 
@@ -110,18 +123,25 @@ TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
 expression  = cal:calculation comp:{compare} ;
 compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
 calculation = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
-factor      = [L_WS] (callable|TYPES) [L_WS] | group ;
+factor      = [L_WS] (increment | callable | TYPES) [L_WS] | group ;
 term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
 group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
 
 
 program         = {program_basics} ;
-program_basics  = ifstatement | whilestatement | dowhilestatement | function | statement ;
+program_basics  = switchstatement | forstatement | ifstatement | whilestatement | dowhilestatement | function | statement ;
 program_common  = break_statement | return_statement | program_basics ;  (* common statments used in IF, FOR WHILE loops*)
-assign          = var:(variable_create | variable_set) [L_WS] oper:(ASSIGN_OPERATORS) ex:(expression) [L_WS] P_STAT_TERMINATOR ;
+assign          = assign_embed [L_WS] P_STAT_TERMINATOR ;
+assign_embed    = var:(variable_create | variable_set) [L_WS] oper:(ASSIGN_OPERATORS) ex:(expression) ;
 statement       = assign | (expression [L_WS] P_STAT_TERMINATOR ) ;
+statement_embed = assign | expression ;
 variable_create = K_VAR L_WS L_VARIABLE [L_WS] ;
 variable_set    = L_VARIABLE [L_WS] ;
+
+
+increment        = pre_increment | post_increment ;
+pre_increment    = oper:(P_PLUS_INC | P_MINUS_INC) [L_WS] var:L_VARIABLE ;
+post_increment   = var:L_VARIABLE [L_WS] oper:(P_PLUS_INC | P_MINUS_INC) ;
 
 
 code_block       = P_SCB [L_WS] {program_common} [L_WS] P_ECB ;
@@ -138,14 +158,25 @@ parameters      = ([L_WS] [expression] [L_WS] { [L_WS] P_ARGS_DELIMITER [L_WS] e
 callable        = name:L_VARIABLE [L_WS] P_S_FUNC_DELI [L_WS] params:parameters [L_WS] P_E_FUNC_DELI ;
 
 
-code_singleline = (program_common) | code_block;
-ifstatement     = K_IF [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] if:code_singleline else:[elsestatement] ;
-elsestatement   = [L_WS] K_ELSE else:code_singleline ;
+codesingleline  = (program_common) | code_block;
+ifstatement     = K_IF [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] if:codesingleline else:[elsestatement] ;
+elsestatement   = [L_WS] K_ELSE else:codesingleline ;
 
 
-whilestatement   = K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] code:code_singleline ;
+whilestatement   = K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] code:codesingleline ;
 dowhilestatement = K_DO [L_WS] code:code_block [L_WS] K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] P_STAT_TERMINATOR [L_WS];
 
 
-(* Entry Points *)
+forstatement     = K_FOR [L_WS] P_S_FUNC_DELI [L_WS] var:[statement_embed]
+                   [L_WS] cond:[expression] [L_WS] P_STAT_TERMINATOR
+                   [L_WS] exp:[statement_embed] [L_WS] P_E_FUNC_DELI [L_WS] code:codesingleline ;
+
+
+switchstatement  = K_SWITCH [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] 
+                   P_SCB [L_WS] cases:{switchdefault | switchcase} [L_WS] P_ECB;
+switchcase       = K_CASE {L_WS}+ ex:expression [L_WS] P_PART_CONDITIONAL_OP code:switchcodeblock ;
+switchdefault    = K_DEFAULT [L_WS] P_PART_CONDITIONAL_OP code:switchcodeblock ;
+switchcodeblock  = {program_common} ;
+
+
 

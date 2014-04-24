@@ -94,6 +94,40 @@ while (br){
 }
 
 var builtin = parseInt('3');
+
+
+var a = j;
+var b = j++;
+var c = j;
+var d = ++j;
+var e = --j;
+
+
+var test_for = 0;
+for (var i = 0; i < 10; i++){
+    if (test_for > 5)
+        break;
+    test_for++;
+}
+
+
+
+var testswitch = '';
+switch(13){
+
+    
+    case 1: 
+        testswitch = 'one';
+        break;
+    case 2:
+        testswitch = 'two';
+    
+    default:
+        testswitch = 'default';
+
+}
+
+
 """
 
 

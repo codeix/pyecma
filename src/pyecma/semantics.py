@@ -25,6 +25,10 @@ class EcmaSemantics(parser.EcmaSemantics):
             return elements.Statement(None, None, ast)
         return elements.Statement(ast.var, ast.oper, ast.ex)
 
+    def statement_embed(self, ast):
+        return self.statement(ast)
+
+
     def break_statement(self, ast):
         return elements.BreakStatement()
     
@@ -42,6 +46,21 @@ class EcmaSemantics(parser.EcmaSemantics):
 
     def dowhilestatement(self, ast):
         return elements.DoWhileStatement(ast.ex, ast.code)
+
+    def forstatement(self, ast):
+        return elements.ForStatement(ast.var, ast.cond, ast.exp, ast.code)
+
+    def switchstatement(self, ast):
+        return elements.SwitchStatement(ast.ex, ast.cases)
+
+    def switchcase(self, ast):
+        return elements.SwitchCase(ast.ex, ast.code)
+
+    def switchdefault(self, ast):
+        return elements.SwitchCaseDefault(ast.code)
+
+    def switchcodeblock(self, ast):
+        return elements.CodeBlock(ast)
 
     def program(self, ast):
         return elements.Program(ast)
@@ -64,7 +83,7 @@ class EcmaSemantics(parser.EcmaSemantics):
     def code_block(self, ast):
         return elements.CodeBlock(ast)
 
-    def code_singleline(self, ast):
+    def codesingleline(self, ast):
         if isinstance(ast, elements.CodeBlock):
             return ast
         return elements.CodeBlock([ast])
@@ -73,6 +92,18 @@ class EcmaSemantics(parser.EcmaSemantics):
     def variable_create(self, ast):
         ast.create = True
         return ast
+
+    def pre_increment(self, ast):
+        return elements.Increment(ast.oper, ast.var, True)
+
+    def post_increment(self, ast):
+        return elements.Increment(ast.oper, ast.var, False)
+
+    def P_PLUS_INC(self, ast):
+        return elements.Assign(lambda x,y: x+y, '+')
+
+    def P_MINUS_INC(self, ast):
+        return elements.Assign(lambda x,y: x-y, '-')
 
     def L_VARIABLE(self, ast):
         return elements.Variable(ast)

@@ -9,15 +9,16 @@
 #
 
 from __future__ import print_function, division, absolute_import, unicode_literals
-from grako.parsing import * # @UnusedWildImport
-from grako.exceptions import * # @UnusedWildImport
+from grako.parsing import * # noqa
+from grako.exceptions import * # noqa
 
-__version__ = '14.109.13.38.53'
+
+__version__ = '14.114.23.44.27'
+
 
 class EcmaParser(Parser):
-    def __init__(self, whitespace=None, nameguard=True, **kwargs):
-        super(EcmaParser, self).__init__(whitespace=whitespace,
-            nameguard=nameguard, **kwargs)
+    def __init__(self, whitespace=None, **kwargs):
+        super(EcmaParser, self).__init__(whitespace=whitespace, **kwargs)
 
     @rule_def
     def _K_BREAK_(self):
@@ -148,6 +149,63 @@ class EcmaParser(Parser):
     def _K_TRY_(self):
         with self._group():
             self._pattern(r'try')
+
+    @rule_def
+    def _K_ALL_(self):
+        with self._choice():
+            with self._option():
+                self._K_BREAK_()
+            with self._option():
+                self._K_DO_()
+            with self._option():
+                self._K_INSTANCEOF_()
+            with self._option():
+                self._K_TYPEOF_()
+            with self._option():
+                self._K_CASE_()
+            with self._option():
+                self._K_ELSE_()
+            with self._option():
+                self._K_NEW_()
+            with self._option():
+                self._K_VAR_()
+            with self._option():
+                self._K_CATCH_()
+            with self._option():
+                self._K_FINALLLY_()
+            with self._option():
+                self._K_RETURN_()
+            with self._option():
+                self._K_VOID_()
+            with self._option():
+                self._K_CONTINUE_()
+            with self._option():
+                self._K_FOR_()
+            with self._option():
+                self._K_SWITCH_()
+            with self._option():
+                self._K_WHILE_()
+            with self._option():
+                self._K_DEBUGGER_()
+            with self._option():
+                self._K_FUNCTION_()
+            with self._option():
+                self._K_THIS_()
+            with self._option():
+                self._K_WITH_()
+            with self._option():
+                self._K_DEFAULT_()
+            with self._option():
+                self._K_IF_()
+            with self._option():
+                self._K_THROW_()
+            with self._option():
+                self._K_DELETE_()
+            with self._option():
+                self._K_IN_()
+            with self._option():
+                self._K_TRY_()
+            self._error('no available options')
 
     @rule_def
     def _P_SCB_(self):
@@ -390,12 +448,125 @@ class EcmaParser(Parser):
             self._pattern(r'\^=')
 
     @rule_def
+    def _P_ALL_(self):
+        with self._choice():
+            with self._option():
+                self._P_SCB_()
+            with self._option():
+                self._P_ECB_()
+            with self._option():
+                self._P_S_FUNC_DELI_()
+            with self._option():
+                self._P_E_FUNC_DELI_()
+            with self._option():
+                self._P_S_ARRAY_DELI_()
+            with self._option():
+                self._P_E_ARRAY_DELI_()
+            with self._option():
+                self._P_ACCESSOR_()
+            with self._option():
+                self._P_STAT_TERMINATOR_()
+            with self._option():
+                self._P_ARGS_DELIMITER_()
+            with self._option():
+                self._P_LT_()
+            with self._option():
+                self._P_GT_()
+            with self._option():
+                self._P_LTE_()
+            with self._option():
+                self._P_GTE_()
+            with self._option():
+                self._P_EQUAL_()
+            with self._option():
+                self._P_NOT_EQUAL_()
+            with self._option():
+                self._P_E_EQUAL_()
+            with self._option():
+                self._P_E_NOT_EQUAL_()
+            with self._option():
+                self._P_PLUS_()
+            with self._option():
+                self._P_MINUS_()
+            with self._option():
+                self._P_MULTIPLY_()
+            with self._option():
+                self._P_DIVIDE_()
+            with self._option():
+                self._P_MODULO_()
+            with self._option():
+                self._P_PLUS_INC_()
+            with self._option():
+                self._P_MINUS_INC_()
+            with self._option():
+                self._P_BITWISE_LEFT_()
+            with self._option():
+                self._P_BITWISE_RIGHT_()
+            with self._option():
+                self._P_BITWISE_RIGHT_UNSIG_()
+            with self._option():
+                self._P_BITWISE_AND_()
+            with self._option():
+                self._P_BITWISE_OR_()
+            with self._option():
+                self._P_BITWISE_XOR_()
+            with self._option():
+                self._P_NOT_()
+            with self._option():
+                self._P_BITWISE_NOT_()
+            with self._option():
+                self._P_AND_()
+            with self._option():
+                self._P_OR_()
+            with self._option():
+                self._P_CONDITIONAL_OP_()
+                self._P_PART_CONDITIONAL_OP_()
+            with self._option():
+                self._P_ASSIGN_()
+            with self._option():
+                self._P_ASSIGN_PLUS_()
+            with self._option():
+                self._P_ASSIGN_MINUS_()
+            with self._option():
+                self._P_ASSIGN_MULTIPLY_()
+            with self._option():
+                self._P_ASSIGN_DIVIDE_()
+            with self._option():
+                self._P_ASSIGN_MODULO_()
+            with self._option():
+                self._P_ASSIGN_BITWISE_LEFT_()
+            with self._option():
+                self._P_ASSIGN_BITWISE_RIGHT_()
+            with self._option():
+                self._P_ASSIGN_BITWISE_RIGHT_UNSIG_()
+            with self._option():
+                self._P_ASSIGN_BITWISE_AND_()
+                self._P_ASSIGN_BITWISE_OR_()
+            with self._option():
+                self._P_ASSIGN_BITWISE_XOR_()
+            self._error('no available options')
+
+    @rule_def
     def _L_WS_(self):
         self._pattern(r'(?:\s+)')
 
     @rule_def
-    def _L_VARIABLE_(self):
+    def _L_VARIABLE_REG_(self):
         self._pattern(r'((?:[A-z]+[0-9]*)+)')
+
+    @rule_def
+    def _L_VARIABLE_(self):
+        with self._ifnot():
+            with self._group():
+                self._K_ALL_()
+                with self._group():
+                    with self._choice():
+                        with self._option():
+                            self._L_WS_()
+                        with self._option():
+                            self._P_ALL_()
+                        self._error('no available options')
+        self._L_VARIABLE_REG_()
 
     @rule_def
     def _P_S_OPER_DELI_(self):
@@ -579,6 +750,8 @@ class EcmaParser(Parser):
                 with self._group():
                     with self._choice():
                         with self._option():
+                            self._increment_()
+                        with self._option():
                             self._callable_()
                         with self._option():
                             self._TYPES_()
@@ -626,6 +799,10 @@ class EcmaParser(Parser):
     def _program_basics_(self):
         with self._choice():
             with self._option():
+                self._switchstatement_()
+            with self._option():
+                self._forstatement_()
+            with self._option():
                 self._ifstatement_()
             with self._option():
                 self._whilestatement_()
@@ -650,6 +827,13 @@ class EcmaParser(Parser):
 
     @rule_def
     def _assign_(self):
+        self._assign_embed_()
+        with self._optional():
+            self._L_WS_()
+        self._P_STAT_TERMINATOR_()
+
+    @rule_def
+    def _assign_embed_(self):
         with self._group():
             with self._choice():
                 with self._option():
@@ -666,9 +850,6 @@ class EcmaParser(Parser):
         with self._group():
             self._expression_()
         self.ast['ex'] = self.last_node
-        with self._optional():
-            self._L_WS_()
-        self._P_STAT_TERMINATOR_()
 
     @rule_def
     def _statement_(self):
@@ -684,6 +865,15 @@ class EcmaParser(Parser):
             self._error('no available options')
 
     @rule_def
+    def _statement_embed_(self):
+        with self._choice():
+            with self._option():
+                self._assign_()
+            with self._option():
+                self._expression_()
+            self._error('no available options')
+
+    @rule_def
     def _variable_create_(self):
         self._K_VAR_()
         self._L_WS_()
@@ -696,6 +886,45 @@ class EcmaParser(Parser):
         self._L_VARIABLE_()
         with self._optional():
             self._L_WS_()
+
+    @rule_def
+    def _increment_(self):
+        with self._choice():
+            with self._option():
+                self._pre_increment_()
+            with self._option():
+                self._post_increment_()
+            self._error('no available options')
+
+    @rule_def
+    def _pre_increment_(self):
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._P_PLUS_INC_()
+                with self._option():
+                    self._P_MINUS_INC_()
+                self._error('no available options')
+        self.ast['oper'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._L_VARIABLE_()
+        self.ast['var'] = self.last_node
+
+    @rule_def
+    def _post_increment_(self):
+        self._L_VARIABLE_()
+        self.ast['var'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._P_PLUS_INC_()
+                with self._option():
+                    self._P_MINUS_INC_()
+                self._error('no available options')
+        self.ast['oper'] = self.last_node
 
     @rule_def
     def _code_block_(self):
@@ -841,7 +1070,7 @@ class EcmaParser(Parser):
         self._P_E_FUNC_DELI_()
 
     @rule_def
-    def _code_singleline_(self):
+    def _codesingleline_(self):
         with self._choice():
             with self._option():
                 with self._group():
@@ -865,7 +1094,7 @@ class EcmaParser(Parser):
         self._P_E_FUNC_DELI_()
         with self._optional():
             self._L_WS_()
-        self._code_singleline_()
+        self._codesingleline_()
         self.ast['if_'] = self.last_node
         with self._optional():
             self._elsestatement_()
@@ -876,7 +1105,7 @@ class EcmaParser(Parser):
         with self._optional():
             self._L_WS_()
         self._K_ELSE_()
-        self._code_singleline_()
+        self._codesingleline_()
         self.ast['else_'] = self.last_node
 
     @rule_def
@@ -894,7 +1123,7 @@ class EcmaParser(Parser):
         self._P_E_FUNC_DELI_()
         with self._optional():
             self._L_WS_()
-        self._code_singleline_()
+        self._codesingleline_()
         self.ast['code'] = self.last_node
 
     @rule_def
@@ -923,6 +1152,98 @@ class EcmaParser(Parser):
         with self._optional():
             self._L_WS_()
 
+    @rule_def
+    def _forstatement_(self):
+        self._K_FOR_()
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        with self._optional():
+            self._statement_embed_()
+        self.ast['var'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        with self._optional():
+            self._expression_()
+        self.ast['cond'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_STAT_TERMINATOR_()
+        with self._optional():
+            self._L_WS_()
+        with self._optional():
+            self._statement_embed_()
+        self.ast['exp'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._codesingleline_()
+        self.ast['code'] = self.last_node
+
+    @rule_def
+    def _switchstatement_(self):
+        self._K_SWITCH_()
+        with self._optional():
+            self._L_WS_()
+        self._P_S_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._expression_()
+        self.ast['ex'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_FUNC_DELI_()
+        with self._optional():
+            self._L_WS_()
+        self._P_SCB_()
+        with self._optional():
+            self._L_WS_()
+        def block2():
+            with self._choice():
+                with self._option():
+                    self._switchdefault_()
+                with self._option():
+                    self._switchcase_()
+                self._error('no available options')
+        self._closure(block2)
+        self.ast['cases'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_ECB_()
+
+    @rule_def
+    def _switchcase_(self):
+        self._K_CASE_()
+        def block0():
+            self._L_WS_()
+        self._positive_closure(block0)
+
+        self._expression_()
+        self.ast['ex'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_PART_CONDITIONAL_OP_()
+        self._switchcodeblock_()
+        self.ast['code'] = self.last_node
+
+    @rule_def
+    def _switchdefault_(self):
+        self._K_DEFAULT_()
+        with self._optional():
+            self._L_WS_()
+        self._P_PART_CONDITIONAL_OP_()
+        self._switchcodeblock_()
+        self.ast['code'] = self.last_node
+
+    @rule_def
+    def _switchcodeblock_(self):
+        def block0():
+            self._program_common_()
+        self._closure(block0)
 
 
 class EcmaSemanticParser(CheckSemanticsMixin, EcmaParser):
@@ -1006,6 +1327,9 @@ class EcmaSemantics(object):
         return ast
 
     def K_TRY(self, ast):
+        return ast
+
+    def K_ALL(self, ast):
         return ast
 
     def P_SCB(self, ast):
@@ -1152,7 +1476,13 @@ class EcmaSemantics(object):
     def P_ASSIGN_BITWISE_XOR(self, ast):
         return ast
 
+    def P_ALL(self, ast):
+        return ast
+
     def L_WS(self, ast):
+        return ast
+
+    def L_VARIABLE_REG(self, ast):
         return ast
 
     def L_VARIABLE(self, ast):
@@ -1224,13 +1554,28 @@ class EcmaSemantics(object):
     def assign(self, ast):
         return ast
 
+    def assign_embed(self, ast):
+        return ast
+
     def statement(self, ast):
+        return ast
+
+    def statement_embed(self, ast):
         return ast
 
     def variable_create(self, ast):
         return ast
 
     def variable_set(self, ast):
+        return ast
+
+    def increment(self, ast):
+        return ast
+
+    def pre_increment(self, ast):
+        return ast
+
+    def post_increment(self, ast):
         return ast
 
     def code_block(self, ast):
@@ -1263,7 +1608,7 @@ class EcmaSemantics(object):
     def callable(self, ast):
         return ast
 
-    def code_singleline(self, ast):
+    def codesingleline(self, ast):
         return ast
 
     def ifstatement(self, ast):
@@ -1278,12 +1623,33 @@ class EcmaSemantics(object):
     def dowhilestatement(self, ast):
         return ast
 
-def main(filename, startrule, trace=False):
+    def forstatement(self, ast):
+        return ast
+
+    def switchstatement(self, ast):
+        return ast
+
+    def switchcase(self, ast):
+        return ast
+
+    def switchdefault(self, ast):
+        return ast
+
+    def switchcodeblock(self, ast):
+        return ast
+
+
+def main(filename, startrule, trace=False, whitespace=None):
     import json
     with open(filename) as f:
         text = f.read()
     parser = EcmaParser(parseinfo=False)
-    ast = parser.parse(text, startrule, filename=filename, trace=trace)
+    ast = parser.parse(
+        text,
+        startrule,
+        filename=filename,
+        trace=trace,
+        whitespace=whitespace)
     print('AST:')
     print(ast)
     print()
@@ -1293,7 +1659,9 @@ def main(filename, startrule, trace=False):
 
 if __name__ == '__main__':
     import argparse
+    import string
     import sys
+
     class ListRules(argparse.Action):
         def __call__(self, parser, namespace, values, option_string):
             print('Rules:')
@@ -1301,14 +1669,17 @@ if __name__ == '__main__':
                 print(r)
             print()
             sys.exit(0)
+
     parser = argparse.ArgumentParser(description="Simple parser for Ecma.")
     parser.add_argument('-l', '--list', action=ListRules, nargs=0,
                         help="list all rules and exit")
     parser.add_argument('-t', '--trace', action='store_true',
                         help="output trace information")
+    parser.add_argument('-w', '--whitespace', type=str, default=string.whitespace,
+                        help="whitespace specification")
     parser.add_argument('file', metavar="FILE", help="the input file to parse")
     parser.add_argument('startrule', metavar="STARTRULE",
                         help="the start rule for parsing")
     args = parser.parse_args()
 
-    main(args.file, args.startrule, trace=args.trace)
+    main(args.file, args.startrule, trace=args.trace, whitespace=args.whitespace)
