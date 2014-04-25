@@ -113,7 +113,7 @@ OPERATORS = P_MINUS | P_PLUS | P_MULTIPLY | P_MODULO | P_DIVIDE | P_BITWISE_LEFT
 ASSIGN_OPERATORS = P_ASSIGN | P_ASSIGN_PLUS | P_ASSIGN_MINUS | P_ASSIGN_MULTIPLY | P_ASSIGN_DIVIDE | P_ASSIGN_MODULO | P_ASSIGN_BITWISE_LEFT |
                    P_ASSIGN_BITWISE_RIGHT | P_ASSIGN_BITWISE_RIGHT_UNSIG | P_ASSIGN_BITWISE_AND | P_ASSIGN_BITWISE_OR | P_ASSIGN_BITWISE_XOR ;
 CREMENT_OPERATORS = P_PLUS_INC | P_MINUS_INC ;
-COMPARE_OPERATORS = P_LT | P_GT | P_LTE | P_GTE | P_EQUAL | P_NOT_EQUAL | P_E_EQUAL | P_E_NOT_EQUAL ;
+COMPARE_OPERATORS = P_LTE | P_GTE | P_LT | P_GT | P_EQUAL | P_NOT_EQUAL | P_E_EQUAL | P_E_NOT_EQUAL ;
 TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
 
 
@@ -125,7 +125,7 @@ compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
 calculation = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
 factor      = [L_WS] (increment | callable | TYPES) [L_WS] | group ;
 term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
-group       = P_S_OPER_DELI >> expression >> P_E_OPER_DELI ;
+group       = [L_WS] P_S_OPER_DELI >> expression >> P_E_OPER_DELI [L_WS] ;
 
 
 program         = {program_basics} ;

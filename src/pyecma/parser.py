@@ -13,7 +13,7 @@ from grako.parsing import * # noqa
 from grako.exceptions import * # noqa
 
 
-__version__ = '14.114.23.44.27'
+__version__ = '14.115.10.35.03'
 
 
 class EcmaParser(Parser):
@@ -666,13 +666,13 @@ class EcmaParser(Parser):
     def _COMPARE_OPERATORS_(self):
         with self._choice():
             with self._option():
-                self._P_LT_()
-            with self._option():
-                self._P_GT_()
-            with self._option():
                 self._P_LTE_()
             with self._option():
                 self._P_GTE_()
+            with self._option():
+                self._P_LT_()
+            with self._option():
+                self._P_GT_()
             with self._option():
                 self._P_EQUAL_()
             with self._option():
@@ -783,11 +783,15 @@ class EcmaParser(Parser):
 
     @rule_def
     def _group_(self):
+        with self._optional():
+            self._L_WS_()
         self._P_S_OPER_DELI_()
         self._cut()
         self._expression_()
         self._cut()
         self._P_E_OPER_DELI_()
+        with self._optional():
+            self._L_WS_()
 
     @rule_def
     def _program_(self):
