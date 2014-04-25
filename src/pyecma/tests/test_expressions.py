@@ -1,5 +1,5 @@
-import unittest
 import pyecma
+import unittest
 
 
 
@@ -7,7 +7,7 @@ class ExpressionsTestCase(unittest.TestCase):
     
     def test_1(self):
         
-        js = """
+        js = r"""
             var a = 1 + 2;
             var b = 1 + 2 * 3;
             var c = (1 + 2) * 3;
@@ -23,7 +23,7 @@ class ExpressionsTestCase(unittest.TestCase):
 
 
     def test_2(self):
-        js = """
+        js = r"""
             var i = 10;
             var a = i++;
             var b = i;
@@ -44,7 +44,7 @@ class ExpressionsTestCase(unittest.TestCase):
 
 
     def test_3(self):
-        js = """
+        js = r"""
             var a = 10;
             a += 10;
             var b = 10;
@@ -65,7 +65,7 @@ class ExpressionsTestCase(unittest.TestCase):
 
 
     def test_4(self):
-        js = """
+        js = r"""
             var a = 1 == 1;
             var b = 2 > 1;
             var c = 1 < 2;
@@ -74,14 +74,39 @@ class ExpressionsTestCase(unittest.TestCase):
             var f = 1==1==1;
             var g = 1==(1==1);
             var h = 1==(1==0);
+            var i = 1 != 1;
+            var j = 2 > 2;
+            var k = 2 < 2;
+            var l = 2 <= 1;
+            var m = 1 >= 2;
         """
         app = pyecma.parse(js)
-        self.assertEqual(app.a, True, 'incorrect comparison')
-        self.assertEqual(app.b, True, 'incorrect comparison')
-        self.assertEqual(app.c, True, 'incorrect comparison')
-        self.assertEqual(app.d, True, 'incorrect comparison')
-        self.assertEqual(app.e, True, 'incorrect comparison')
-        self.assertEqual(app.f, True, 'incorrect comparison')
-        self.assertEqual(app.g, True, 'incorrect comparison')
-        self.assertEqual(app.h, False, 'incorrect comparison')
+        self.assertTrue(app.a, 'incorrect comparison')
+        self.assertTrue(app.b, 'incorrect comparison')
+        self.assertTrue(app.c, 'incorrect comparison')
+        self.assertTrue(app.d, 'incorrect comparison')
+        self.assertTrue(app.e, 'incorrect comparison')
+        self.assertTrue(app.f, 'incorrect comparison')
+        self.assertTrue(app.g, 'incorrect comparison')
+        self.assertFalse(app.h, 'incorrect comparison')
+        self.assertFalse(app.i, 'incorrect comparison')
+        self.assertFalse(app.j, 'incorrect comparison')
+        self.assertFalse(app.k, 'incorrect comparison')
+        self.assertFalse(app.l, 'incorrect comparison')
+        self.assertFalse(app.m, 'incorrect comparison')
 
+
+    def test_4(self):
+        js = r"""
+            var a = 'Hello World';
+            var b = "Hello World";
+            var c = 'it\'s works :-)';
+            var d = 'Hello' + ' World';
+            var e = 'Hello';
+            var e += ' World';
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 'Hello World', 'incorrect comparison')
+        self.assertEqual(app.b, 'Hello World', 'incorrect comparison')
+        self.assertEqual(app.c, "it's works :-)", 'incorrect comparison')
+        self.assertEqual(app.e, 'Hello World', 'incorrect comparison')
