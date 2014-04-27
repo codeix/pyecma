@@ -126,6 +126,11 @@ class EcmaSemantics(parser.EcmaSemantics):
         trim = trim.replace(r'\"', '"')
         return types.String(trim)
 
+    def T_BOOL(self, ast):
+        if ast == 'true':
+            return types.Bool(True)
+        return types.Bool(False)
+
     def P_STAT_TERMINATOR(self, ast):
         return None
     

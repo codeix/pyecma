@@ -13,7 +13,7 @@ from grako.parsing import * # noqa
 from grako.exceptions import * # noqa
 
 
-__version__ = '14.116.23.18.24'
+__version__ = '14.117.02.10.52'
 
 
 class EcmaParser(Parser):
@@ -151,6 +151,16 @@ class EcmaParser(Parser):
             self._pattern(r'try')
 
     @rule_def
+    def _K_TRUE_(self):
+        with self._group():
+            self._pattern(r'true')
+
+    @rule_def
+    def _K_FALSE_(self):
+        with self._group():
+            self._pattern(r'false')
+
+    @rule_def
     def _K_ALL_(self):
         with self._choice():
             with self._option():
@@ -205,6 +215,10 @@ class EcmaParser(Parser):
                 self._K_IN_()
             with self._option():
                 self._K_TRY_()
+            with self._option():
+                self._K_TRUE_()
+            with self._option():
+                self._K_FALSE_()
             self._error('no available options')
 
     @rule_def
@@ -592,7 +606,12 @@ class EcmaParser(Parser):
 
     @rule_def
     def _T_BOOL_(self):
-        self._pattern(r'true|false')
+        with self._choice():
+            with self._option():
+                self._K_TRUE_()
+            with self._option():
+                self._K_FALSE_()
+            self._error('no available options')
 
     @rule_def
     def _T_STRING_(self):
@@ -601,7 +620,7 @@ class EcmaParser(Parser):
                 self._pattern(r'"(?:\\"|[^";])*"')
             with self._option():
                 self._pattern(r"'(?:\\'|[^';])*'")
-            self._error('expecting one of: \'(?:\\\'|[^\';])*\' "(?:\\"|[^";])*"')
+            self._error('expecting one of: "(?:\\"|[^";])*" \'(?:\\\'|[^\';])*\'')
 
     @rule_def
     def _OPERATORS_(self):
@@ -1337,6 +1356,12 @@ class EcmaSemantics(object):
         return ast
 
     def K_TRY(self, ast):
+        return ast
+
+    def K_TRUE(self, ast):
+        return ast
+
+    def K_FALSE(self, ast):
         return ast
 
     def K_ALL(self, ast):

@@ -29,9 +29,11 @@ K_THROW = (?/throw/?) ;
 K_DELETE = (?/delete/?) ;
 K_IN = (?/in/?) ;
 K_TRY = (?/try/?) ;
+K_TRUE = (?/true/?) ;
+K_FALSE = (?/false/?) ;
 K_ALL = K_BREAK | K_DO | K_INSTANCEOF | K_TYPEOF | K_CASE | K_ELSE | K_NEW | K_VAR | K_CATCH | K_FINALLLY |
         K_RETURN | K_VOID | K_CONTINUE | K_FOR | K_SWITCH | K_WHILE | K_DEBUGGER | K_FUNCTION | K_THIS | K_WITH | 
-        K_DEFAULT | K_IF | K_THROW | K_DELETE | K_IN | K_TRY ;
+        K_DEFAULT | K_IF | K_THROW | K_DELETE | K_IN | K_TRY | K_TRUE | K_FALSE ;
 
 
 
@@ -105,7 +107,7 @@ P_E_OPER_DELI = (?/\)/?) ;
 T_NUMBER = ?/[\+-]?[0-9]+(?:\.[0-9]*)?(?:[eE][-\+]?[0-9])?/? ;
 T_UNDEFINED = ?/undefined/? ;
 T_NULL = ?/null/? ;
-T_BOOL = ?/true|false/? ;
+T_BOOL = K_TRUE | K_FALSE ;
 T_STRING = ?/"(?:\\"|[^";])*"/?|?/'(?:\\'|[^';])*'/? ;
 
 (* Grammar Groups *)
