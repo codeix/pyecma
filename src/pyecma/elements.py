@@ -8,7 +8,7 @@ from pyecma.builtins import AbstractFunction
 class Program(object):
 
     def __init__(self, ast):
-        self.__dict__ = Scope(Scope(GlobalScope()))
+        self.__dict__ = GlobalScope()
         self.run(ast, self.__dict__)
 
     def run(self, statements, scope):
@@ -24,8 +24,13 @@ class CodeBlock(Program):
     def run(self, scope):
         for statement in self.statements:
             re = statement.prepare(scope)
-            if re is not None:
-                return re
+            if isinstance(re, tuple):
+                val, stat = re
+            else:
+                val, stat = re, None
+            if val is not None:
+                return val, stat
+        return val, stat
 
 
 class Operator(object):
@@ -150,6 +155,11 @@ class Statement(object):
     def prepare(self, scope):
         return self(scope)
 
+    def returnbehavior(self, value, statement):
+        if isinstance(statement, BreakStatement):
+            return None
+        return value, statement
+
 
 class IfStatement(Statement):
     
@@ -175,9 +185,9 @@ class WhileStatement(Statement):
     def __call__(self, scope):
         scope = Scope(scope)
         while self.expression(scope):
-            re = self.codeblock.run(scope)
+            re, stat = self.codeblock.run(scope)
             if re is not None:
-                return re
+                return self.returnbehavior(re, stat)
 
 
 class DoWhileStatement(WhileStatement):
@@ -185,9 +195,9 @@ class DoWhileStatement(WhileStatement):
     def __call__(self, scope):
         scope = Scope(scope)
         while True:
-            re = self.codeblock.run(scope)
+            re, stat = self.codeblock.run(scope)
             if re is not None:
-                return re
+                return self.returnbehavior(re, stat)
             if not self.expression(scope):
                 break
 
@@ -205,9 +215,9 @@ class ForStatement(Statement):
         if self.variable is not None:
             self.variable(scope)
         while True:
-            re = self.codeblock.run(scope)
+            re, stat = self.codeblock.run(scope)
             if re is not None:
-                return re
+                return self.returnbehavior(re, stat)
             if self.expression is not None:
                 self.expression(scope)
             if self.condition is not None:
@@ -236,10 +246,10 @@ class SwitchStatement(Statement):
         for index, case in enumerate(self.cases):
             if isinstance(case, SwitchCase):
                 if not checkmatch or case.match(scope, comparevalue):
-                    re = case.run(scope)
+                    re, stat = case.run(scope)
                     hasmatch = True
                     if re is not None:
-                        return re
+                        return self.returnbehavior(re, stat)
                     else:
                         checkmatch = False
             if not hasmatch and index + 1 is len(self.cases) and self.hasdefault:
@@ -278,7 +288,7 @@ class ReturnStatement(Statement):
         self.expression = expression
 
     def __call__(self, scope):
-        return self.expression(scope)
+        return self.expression(scope), self
 
 
 class BreakStatement(ReturnStatement):
@@ -287,7 +297,7 @@ class BreakStatement(ReturnStatement):
         pass
 
     def __call__(self, scope):
-        return types.Undefinded()
+        return types.Undefinded(), self
 
 
 class Function(AbstractFunction):
@@ -301,7 +311,11 @@ class Function(AbstractFunction):
         self.signatur = sign
     
     def __call__(self, *args):
-        return self.code.run(self.createscope(args, self.scope))
+        scope = Scope(self.scope)
+        re = self.code.run(self.createscope(args, scope))
+        if isinstance(re, tuple):
+            re, stat = re
+        return re
 
     def prepare(self, scope):
         self.scope = scope

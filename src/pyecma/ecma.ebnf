@@ -167,7 +167,7 @@ whilestatement   = K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_
 dowhilestatement = K_DO [L_WS] code:code_block [L_WS] K_WHILE [L_WS] P_S_FUNC_DELI [L_WS] ex:expression [L_WS] P_E_FUNC_DELI [L_WS] P_STAT_TERMINATOR [L_WS];
 
 
-forstatement     = K_FOR [L_WS] P_S_FUNC_DELI [L_WS] var:[statement_embed]
+forstatement     = K_FOR [L_WS] P_S_FUNC_DELI [L_WS] (P_STAT_TERMINATOR | var:[statement_embed])
                    [L_WS] cond:[expression] [L_WS] P_STAT_TERMINATOR
                    [L_WS] exp:[statement_embed] [L_WS] P_E_FUNC_DELI [L_WS] code:codesingleline ;
 

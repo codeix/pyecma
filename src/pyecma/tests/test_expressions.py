@@ -12,7 +12,7 @@ class ExpressionsTestCase(unittest.TestCase):
             var b = 1 + 2 * 3;
             var c = (1 + 2) * 3;
             var d = (1 + 2) * (3 + 3);
-            var e = (1 + (2 * 4)) * (3 + 3);
+            var e = (1 + 2 * 4) * ((2 + 1) * 2);
         """
         app = pyecma.parse(js)
         self.assertEqual(app.a, 3, 'incorrect addition')

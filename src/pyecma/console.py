@@ -3,6 +3,8 @@ from pyecma.parser import EcmaParser
 
 js = r"""
 
+sc = 999;
+
 function abs(value){
     if (value < 0)
         return value * -1;
