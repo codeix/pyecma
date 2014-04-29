@@ -233,27 +233,25 @@ class SwitchStatement(Statement):
         self.expression = expression
         self.cases = cases
         c = len([i for i in cases if isinstance(i, SwitchCaseDefault)])
-        if c > 0:
-            self.hasdefault = True
         if c > 1:
             raise exceptions.SyntaxError('More than one default clause in switch statement')
 
     def __call__(self, scope):
         scope = Scope(scope)
         comparevalue = self.expression(scope)
-        checkmatch = True
-        hasmatch = False
-        for index, case in enumerate(self.cases):
-            if isinstance(case, SwitchCase):
-                if not checkmatch or case.match(scope, comparevalue):
+        checkmatch = False
+        for case in self.cases:
+            if checkmatch or isinstance(case, SwitchCase):
+                if checkmatch or case.match(scope, comparevalue):
                     re, stat = case.run(scope)
-                    hasmatch = True
+                    checkmatch = True
                     if re is not None:
                         return self.returnbehavior(re, stat)
-                    else:
-                        checkmatch = False
-            if not hasmatch and index + 1 is len(self.cases) and self.hasdefault:
-                return case.run(scope)
+
+        if not checkmatch:
+            for case in self.cases:
+                if isinstance(case, SwitchCaseDefault):
+                    return case.run(scope)
 
 
 class SwitchCase(object):
