@@ -69,3 +69,24 @@ class SwitchTestCase(unittest.TestCase):
         app = pyecma.parse(js)
         self.assertEqual(app.switchtest(1), 'one', 'incorrect switch')
         self.assertEqual(app.switchtest(2), 'two', 'incorrect switch')
+
+    def test_4(self):
+        
+        js = r"""
+            function switchtest(sw){
+                var a = '';
+                switch(sw){
+                    case 1: 
+                        a = 'one';
+                    case 2:
+                        a = 'two';
+                    default:
+                        a = 'default';
+                }
+                return a;
+            }
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.switchtest(1), 'default', 'incorrect switch')
+        self.assertEqual(app.switchtest(2), 'default', 'incorrect switch')
+        self.assertEqual(app.switchtest(3), 'default', 'incorrect switch')
