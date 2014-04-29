@@ -58,8 +58,8 @@ class Operator(object):
         return '<ECMAScript Operator a%sb>' % self.name
     
     def autocasting(self, x, y):
-        if (isinstance(x, (types.String, types.Undefinded,)) or
-            isinstance(y, (types.String, types.Undefinded,))):
+        if (isinstance(x, (types.String, types.Undefined,)) or
+            isinstance(y, (types.String, types.Undefined,))):
             return types.String, types.String(str(x)), types.String(str(y))
         return types.Number, self.cast(x), self.cast(y)
     
@@ -144,7 +144,7 @@ class Statement(object):
         
     def __call__(self, scope):
         if self.expression is None:
-            scope.set(self.variable, types.Undefinded())
+            scope.set(self.variable, types.Undefined())
         elif self.assign is None:
             self.expression(scope)
         else:
@@ -295,7 +295,7 @@ class BreakStatement(ReturnStatement):
         pass
 
     def __call__(self, scope):
-        return types.Undefinded(), self
+        return types.Undefined(), self
 
 
 class Function(AbstractFunction):

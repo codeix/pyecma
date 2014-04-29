@@ -31,7 +31,7 @@ class Scope(dict):
         try:
             return self[variable]
         except exceptions.ReferenceError:
-            return types.Undefinded()
+            return types.Undefined()
 
     def __getitem__(self, variable):
         variable = str(variable)

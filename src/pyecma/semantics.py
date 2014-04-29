@@ -131,6 +131,9 @@ class EcmaSemantics(parser.EcmaSemantics):
             return types.Bool(True)
         return types.Bool(False)
 
+    def T_UNDEFINED(self, ast):
+        return types.Undefined()
+
     def P_STAT_TERMINATOR(self, ast):
         return None
     

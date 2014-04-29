@@ -31,10 +31,10 @@ class Bool(int, AbstractType):
         return '<ECMAScript Bool <%s>>' % (self and 'True' or 'False')
 
 
-class Undefinded(AbstractType):
+class Undefined(AbstractType):
 
     def __repr__(self):
-        return '<ECMAScript undefinded>'
+        return '<ECMAScript undefined>'
 
 
 class NaN(AbstractType):
