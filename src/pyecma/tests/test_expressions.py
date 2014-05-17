@@ -115,3 +115,18 @@ class ExpressionsTestCase(unittest.TestCase):
     def test_5(self):
         self.assertEqual(pyecma.eval('1 + 1'), 2, 'incorrect comparison')
         self.assertEqual(pyecma.eval('1 + 2 * 3'), 7, 'incorrect comparison')
+
+
+    def test_6(self):
+        js = r"""
+            var a = 'Hello World';
+            // var a = "inline comment";
+            /*
+            multiline
+            commment
+            here
+            */
+
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 'Hello World', 'incorrect comparison')
