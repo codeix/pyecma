@@ -20,6 +20,19 @@ class FunctionsTestCase(unittest.TestCase):
         self.assertEqual(app.echo(True), True, 'incorrect function echo')
 
 
+    def test_echo_inline(self):
+        js = r"""
+        var echo = function (arg){
+            return arg ;
+        }
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.echo('Hello'), 'Hello', 'incorrect function echo')
+        self.assertEqual(app.echo('World'), 'World', 'incorrect function echo')
+        self.assertEqual(app.echo(42), 42, 'incorrect function echo')
+        self.assertEqual(app.echo(True), True, 'incorrect function echo')
+
+
     def test_gcd(self):
         
         js = r"""
