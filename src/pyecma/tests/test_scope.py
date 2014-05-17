@@ -40,3 +40,20 @@ class ScopeTestCase(unittest.TestCase):
         """
         app = pyecma.parse(js)
         self.assertIsInstance(app.toInt('1'), types.Number, 'incorrect builtin')
+
+
+    def test_3(self):
+        
+        js = r"""
+            a = 1;
+            function increment(){
+                a++;
+            }
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 1, 'incorrect builtin')
+        app.a = 2
+        self.assertEqual(app.a, 2, 'incorrect builtin')
+        app.increment()
+        self.assertEqual(app.a, 3, 'incorrect builtin')
+
