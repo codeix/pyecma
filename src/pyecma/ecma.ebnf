@@ -121,7 +121,6 @@ TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
 
 (* Grammar *)
 
-(* http://www.boost.org/doc/libs/1_54_0/libs/spirit/classic/doc/introduction.html *)
 expression  = cal:calculation comp:{compare} ;
 compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
 calculation = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;

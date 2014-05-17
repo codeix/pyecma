@@ -13,7 +13,7 @@ from grako.parsing import * # noqa
 from grako.exceptions import * # noqa
 
 
-__version__ = '14.137.09.29.02'
+__version__ = '14.137.10.54.53'
 
 
 class EcmaParser(Parser):
@@ -620,7 +620,7 @@ class EcmaParser(Parser):
                 self._pattern(r'"(?:\\"|[^";])*"')
             with self._option():
                 self._pattern(r"'(?:\\'|[^';])*'")
-            self._error('expecting one of: \'(?:\\\'|[^\';])*\' "(?:\\"|[^";])*"')
+            self._error('expecting one of: "(?:\\"|[^";])*" \'(?:\\\'|[^\';])*\'')
 
     @rule_def
     def _OPERATORS_(self):
