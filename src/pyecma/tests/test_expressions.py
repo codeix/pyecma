@@ -110,3 +110,8 @@ class ExpressionsTestCase(unittest.TestCase):
         self.assertEqual(app.b, 'Hello World', 'incorrect comparison')
         self.assertEqual(app.c, "it's works :-)", 'incorrect comparison')
         self.assertEqual(app.e, 'Hello World', 'incorrect comparison')
+
+
+    def test_5(self):
+        self.assertEqual(pyecma.eval('1 + 1'), 2, 'incorrect comparison')
+        self.assertEqual(pyecma.eval('1 + 2 * 3'), 7, 'incorrect comparison')

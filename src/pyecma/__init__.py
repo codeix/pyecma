@@ -15,4 +15,5 @@ def open(filepath):
 
 
 def eval(ecmacode):
-    return parser.parse(ecmacode, 'expression', filename=filepath, semantics=EcmaSemantics())
+    parser = EcmaParser()
+    return parser.parse(ecmacode, 'expression', filename=None, semantics=EcmaSemantics())()
