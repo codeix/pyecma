@@ -44,3 +44,47 @@ class WhileTestCase(unittest.TestCase):
         """
         app = pyecma.parse(js)
         self.assertEqual(app.a, 10, 'incorrect while')
+
+
+    def test_3(self):
+        
+        js = r"""
+            var a = 1;
+            var b = 1;
+            while(true){
+                a += 1;
+                if (a < 5){
+                    b *= a;
+                    continue;
+                    a += 2000;
+                }
+                b += a;
+                if (a > 10)
+                   break;
+            }
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 11, 'incorrect while')
+        self.assertEqual(app.b, 80, 'incorrect while')
+
+
+    def test_4(self):
+        
+        js = r"""
+            var a = 1;
+            var b = 1;
+            do {
+                a += 1;
+                if (a < 5){
+                    b *= a;
+                    continue;
+                    a += 3000;
+                }
+                b += a;
+                if (a > 10)
+                   break;
+            } while (true);
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 11, 'incorrect while')
+        self.assertEqual(app.b, 80, 'incorrect while')

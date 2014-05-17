@@ -186,6 +186,8 @@ class WhileStatement(Statement):
         scope = Scope(scope)
         while self.expression(scope):
             re, stat = self.codeblock.run(scope)
+            if isinstance(stat, ContinueStatement):
+                continue
             if re is not None:
                 return self.returnbehavior(re, stat)
 
@@ -196,6 +198,8 @@ class DoWhileStatement(WhileStatement):
         scope = Scope(scope)
         while True:
             re, stat = self.codeblock.run(scope)
+            if isinstance(stat, ContinueStatement):
+                continue
             if re is not None:
                 return self.returnbehavior(re, stat)
             if not self.expression(scope):
@@ -216,7 +220,7 @@ class ForStatement(Statement):
             self.variable(scope)
         while True:
             re, stat = self.codeblock.run(scope)
-            if re is not None:
+            if re is not None and not isinstance(stat, ContinueStatement):
                 return self.returnbehavior(re, stat)
             if self.expression is not None:
                 self.expression(scope)
@@ -296,6 +300,10 @@ class BreakStatement(ReturnStatement):
 
     def __call__(self, scope):
         return types.Undefined(), self
+
+
+class ContinueStatement(BreakStatement):
+    pass
 
 
 class Function(AbstractFunction):

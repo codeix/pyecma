@@ -35,6 +35,9 @@ class EcmaSemantics(parser.EcmaSemantics):
     def return_statement(self, ast):
         return elements.ReturnStatement(ast.ex)
 
+    def continue_statement(self, ast):
+        return elements.ContinueStatement()
+
     def ifstatement(self, ast):
         else_ = None
         if ast.else_:

@@ -13,7 +13,7 @@ from grako.parsing import * # noqa
 from grako.exceptions import * # noqa
 
 
-__version__ = '14.117.02.10.52'
+__version__ = '14.137.09.29.02'
 
 
 class EcmaParser(Parser):
@@ -620,7 +620,7 @@ class EcmaParser(Parser):
                 self._pattern(r'"(?:\\"|[^";])*"')
             with self._option():
                 self._pattern(r"'(?:\\'|[^';])*'")
-            self._error('expecting one of: "(?:\\"|[^";])*" \'(?:\\\'|[^\';])*\'')
+            self._error('expecting one of: \'(?:\\\'|[^\';])*\' "(?:\\"|[^";])*"')
 
     @rule_def
     def _OPERATORS_(self):
@@ -841,6 +841,8 @@ class EcmaParser(Parser):
     def _program_common_(self):
         with self._choice():
             with self._option():
+                self._continue_statement_()
+            with self._option():
                 self._break_statement_()
             with self._option():
                 self._return_statement_()
@@ -976,6 +978,13 @@ class EcmaParser(Parser):
     @rule_def
     def _break_statement_(self):
         self._K_BREAK_()
+        with self._optional():
+            self._L_WS_()
+        self._P_STAT_TERMINATOR_()
+
+    @rule_def
+    def _continue_statement_(self):
+        self._K_CONTINUE_()
         with self._optional():
             self._L_WS_()
         self._P_STAT_TERMINATOR_()
@@ -1620,6 +1629,9 @@ class EcmaSemantics(object):
         return ast
 
     def break_statement(self, ast):
+        return ast
+
+    def continue_statement(self, ast):
         return ast
 
     def arguments(self, ast):

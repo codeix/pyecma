@@ -76,6 +76,19 @@ class ForTestCase(unittest.TestCase):
         """
         app = pyecma.parse(js)
         self.assertEqual(app.a, 60, 'incorrect for loop')
-    
-    
 
+
+    def test_7(self):
+        js = r"""
+            var a = 1;
+            for(var i = 0; i< 10; i++){
+                if (i < 5){
+                    a *= i;
+                    continue;
+                    a += 1000;
+                }
+                a += i;
+            }
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 35, 'incorrect while')
