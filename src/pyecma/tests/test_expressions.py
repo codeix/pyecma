@@ -122,11 +122,13 @@ class ExpressionsTestCase(unittest.TestCase):
             var a = 'Hello World';
             // var a = "inline comment";
             /*
-            multiline
-            commment
-            here
+                multiline
+                commments
+                here
             */
-
+            var b = 'code is continue here';
         """
         app = pyecma.parse(js)
         self.assertEqual(app.a, 'Hello World', 'incorrect comparison')
+        self.assertEqual(app.b, 'code is continue here', 'incorrect comparison')
+
