@@ -1,3 +1,11 @@
+"""
+ this was just created for make some test while the developing. In
+ Future this should replace with a interactive ECMAScript Console.
+
+"""
+
+
+
 from pyecma.semantics import EcmaSemantics
 from pyecma.parser import EcmaParser
 
