@@ -96,7 +96,7 @@ class ExpressionsTestCase(unittest.TestCase):
         self.assertFalse(app.m, 'incorrect comparison')
 
 
-    def test_4(self):
+    def test_5(self):
         js = r"""
             var a = 'Hello World';
             var b = "Hello World";
@@ -112,12 +112,12 @@ class ExpressionsTestCase(unittest.TestCase):
         self.assertEqual(app.e, 'Hello World', 'incorrect comparison')
 
 
-    def test_5(self):
+    def test_6(self):
         self.assertEqual(pyecma.eval('1 + 1'), 2, 'incorrect comparison')
         self.assertEqual(pyecma.eval('1 + 2 * 3'), 7, 'incorrect comparison')
 
 
-    def test_6(self):
+    def test_7(self):
         js = r"""
             var a = 'Hello World';
             // var a = "inline comment";

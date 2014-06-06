@@ -35,7 +35,7 @@ class WhileTestCase(unittest.TestCase):
         app = pyecma.parse(js)
         self.assertEqual(app.a, 6, 'incorrect while')
 
-    def test_2(self):
+    def test_3(self):
         
         js = r"""
             var a = 1;
@@ -46,7 +46,7 @@ class WhileTestCase(unittest.TestCase):
         self.assertEqual(app.a, 10, 'incorrect while')
 
 
-    def test_3(self):
+    def test_4(self):
         
         js = r"""
             var a = 1;
@@ -68,7 +68,7 @@ class WhileTestCase(unittest.TestCase):
         self.assertEqual(app.b, 80, 'incorrect while')
 
 
-    def test_4(self):
+    def test_5(self):
         
         js = r"""
             var a = 1;
