@@ -1,6 +1,8 @@
 from pyecma import types
 from pyecma import parser
 from pyecma import elements
+from pyecma import objects
+
 
 
 class EcmaSemantics(parser.EcmaSemantics):
@@ -75,13 +77,25 @@ class EcmaSemantics(parser.EcmaSemantics):
         ast.name.create = True
         return ast
 
+    def object(self, ast):
+        items = ast.objectitems
+        if len(items) is 2:
+            items = [items[1]] + items[0]
+        return objects.Object(items)
+
+    def array(self, ast):
+        import pdb;pdb.set_trace()
+        items = ast.listitems
+        if len(items) is 2:
+            items = [items[1]] + items[0]
+        return objects.Array(items)
+
     def callable(self, ast):
         if len(ast.params) == 2:
             params = ast.params[1] + [ast.params[0]]
         else:
             params = ast.params
         return elements.Callable(ast.name, params)
-
 
     def code_block(self, ast):
         return elements.CodeBlock(ast)
@@ -90,7 +104,6 @@ class EcmaSemantics(parser.EcmaSemantics):
         if isinstance(ast, elements.CodeBlock):
             return ast
         return elements.CodeBlock([ast])
-        
 
     def variable_create(self, ast):
         ast.create = True

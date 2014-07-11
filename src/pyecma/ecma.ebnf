@@ -97,7 +97,7 @@ P_ALL = P_SCB | P_ECB | P_S_FUNC_DELI | P_E_FUNC_DELI | P_S_ARRAY_DELI | P_E_ARR
 
 (* Language *)
 L_WS = ?/(?:\s+)/? ;
-L_VARIABLE_REG = ?/((?:[A-z]+[0-9]*)+)/? ;
+L_VARIABLE_REG = ?/((?:[^\W0-9]+[0-9]*)+)/? ;
 L_VARIABLE = !(K_ALL (L_WS | P_ALL)) L_VARIABLE_REG ;
 P_S_OPER_DELI = (?/\(/?) ;
 P_E_OPER_DELI = (?/\)/?) ;
@@ -116,17 +116,17 @@ ASSIGN_OPERATORS = P_ASSIGN | P_ASSIGN_PLUS | P_ASSIGN_MINUS | P_ASSIGN_MULTIPLY
                    P_ASSIGN_BITWISE_RIGHT | P_ASSIGN_BITWISE_RIGHT_UNSIG | P_ASSIGN_BITWISE_AND | P_ASSIGN_BITWISE_OR | P_ASSIGN_BITWISE_XOR ;
 CREMENT_OPERATORS = P_PLUS_INC | P_MINUS_INC ;
 COMPARE_OPERATORS = P_LTE | P_GTE | P_LT | P_GT | P_EQUAL | P_NOT_EQUAL | P_E_EQUAL | P_E_NOT_EQUAL ;
-TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
-
+TYPES             = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE | OBJECTTYPES ;
+OBJECTTYPES       = object | array ;
 
 (* Grammar *)
 
 expression  = cal:calculation comp:{compare} ;
 compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
-calculation = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
+calculation = term ~ {(P_PLUS ~ term) | (P_MINUS ~ term)} ;
 factor      = [L_WS] (increment | callable | TYPES) [L_WS] | group ;
-term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
-group       = [L_WS] P_S_OPER_DELI >> expression >> P_E_OPER_DELI [L_WS] ;
+term        = factor ~ {(P_MULTIPLY ~ factor) | (P_DIVIDE ~ factor)} ;
+group       = [L_WS] P_S_OPER_DELI ~ expression ~ P_E_OPER_DELI [L_WS] ;
 
 
 program         = {program_basics} ;
@@ -180,5 +180,10 @@ switchcase       = K_CASE {L_WS}+ ex:expression [L_WS] P_PART_CONDITIONAL_OP cod
 switchdefault    = K_DEFAULT [L_WS] P_PART_CONDITIONAL_OP code:switchcodeblock ;
 switchcodeblock  = {program_common} ;
 
+
+array            = P_S_ARRAY_DELI listitems:([L_WS] {content [L_WS] P_ARGS_DELIMITER [L_WS]} [content] [L_WS]) [L_WS] P_E_ARRAY_DELI ;
+object           = P_SCB [L_WS] objectitems:([L_WS] {objectitem [L_WS] P_ARGS_DELIMITER [L_WS]} [objectitem] [L_WS]) [L_WS] P_ECB ;
+objectitem       = key:(T_STRING|L_VARIABLE) [L_WS] P_PART_CONDITIONAL_OP [L_WS] value:content [L_WS] ;
+content          = [L_WS] K_FUNCTION [L_WS] function_body [L_WS] | expression ;
 
 
