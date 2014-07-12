@@ -79,13 +79,13 @@ class EcmaSemantics(parser.EcmaSemantics):
     def object(self, ast):
         items = ast.objectitems
         if len(items) is 2:
-            items = [items[1]] + items[0]
+            items = items[0] + [items[1]]
         return types.Object(items)
 
     def array(self, ast):
         items = ast.listitems
         if len(items) is 2:
-            items = [items[1]] + items[0]
+            items = items[0] + [items[1]]
         return types.Array(items)
 
     def callable(self, ast):

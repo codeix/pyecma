@@ -377,10 +377,12 @@ class Callable(object):
 class Accessible(object):
     
     def __init__(self, obj, access):
-        pass
-    
+        self.obj = obj
+        self.access = access
+
     def __call__(self, scope):
-        return self
+        index = self.access(scope)
+        return self.obj(scope)[index[len(index)-1]]
     
     def __repr__(self):
         return '<Accessible Array <[%s]>>' % ', '.join(self.items)

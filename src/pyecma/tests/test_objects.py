@@ -10,7 +10,7 @@ class ObjectsTestCase(unittest.TestCase):
         js = r"""
             var a = [1,2,3];
             var b = {'abc':1};
-            var c = a[1];
+            var c = a[1+1];
         """
 
         app = pyecma.parse(js)
