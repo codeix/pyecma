@@ -16,7 +16,7 @@ from grako.parsing import graken, Parser
 from grako.exceptions import *  # noqa
 
 
-__version__ = '2014.07.11.19.33.30.04'
+__version__ = '2014.07.12.16.09.25.05'
 
 __all__ = [
     'EcmaParser',
@@ -810,6 +810,8 @@ class EcmaParser(Parser):
                 with self._group():
                     with self._choice():
                         with self._option():
+                            self._accessible_()
+                        with self._option():
                             self._increment_()
                         with self._option():
                             self._callable_()
@@ -1513,6 +1515,20 @@ class EcmaParser(Parser):
                 self._expression_()
             self._error('no available options')
 
+    @graken()
+    def _accessible_(self):
+        self._TYPES_()
+        self.ast['obj'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._array_()
+        self.ast['access'] = self.last_node
+
+        self.ast._define(
+            ['obj', 'access'],
+            []
+        )
+
 
 class EcmaSemantics(object):
     def K_BREAK(self, ast):
@@ -1924,6 +1940,9 @@ class EcmaSemantics(object):
         return ast
 
     def content(self, ast):
+        return ast
+
+    def accessible(self, ast):
         return ast
 
 

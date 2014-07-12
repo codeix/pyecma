@@ -49,3 +49,32 @@ class Null(AbstractType):
         return '<ECMAScript Null>'
 
 
+class Object(dict):
+    
+    def __init__(self, items):
+        if isinstance(items, list):
+            self.update(dict([(i.key, i.value,) for i in items]))
+        else:
+            self.update(items)
+    
+    def __call__(self, scope):
+        di = dict()
+        for k, v in self.items():
+            di[k(scope)] = v(scope)
+        return self.__class__(di)
+    
+    def __repr__(self):
+        return '<ECMAScript Object <{%s}>>' % ', '.join(['%s: %s' % (repr(k),repr(v),) for k,v in self.items()])
+
+
+class Array(Object):
+    
+    def __init__(self, items):
+        if isinstance(items, list):
+            self.update(dict([(Number(k), v,) for k, v in enumerate(items)]))
+        else:
+            self.update(items)
+    
+    def __repr__(self):
+        return '<ECMAScript Array <[%s]>>' % ', '.join([repr(i) for i in self])
+
