@@ -123,10 +123,10 @@ TYPES = T_NUMBER | T_UNDEFINED | T_NULL | T_BOOL | T_STRING | L_VARIABLE;
 
 expression  = cal:calculation comp:{compare} ;
 compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
-calculation = term >> {(P_PLUS >> term) | (P_MINUS >> term)} ;
+calculation = term ~ {(P_PLUS ~ term) | (P_MINUS ~ term)} ;
 factor      = [L_WS] (increment | callable | TYPES) [L_WS] | group ;
-term        = factor >> {(P_MULTIPLY >> factor) | (P_DIVIDE >> factor)} ;
-group       = [L_WS] P_S_OPER_DELI >> expression >> P_E_OPER_DELI [L_WS] ;
+term        = factor ~ {(P_MULTIPLY ~ factor) | (P_DIVIDE ~ factor)} ;
+group       = [L_WS] P_S_OPER_DELI ~ expression ~ P_E_OPER_DELI [L_WS] ;
 
 
 program         = {program_basics} ;
