@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/codeix/pyecma.svg?branch=master
+    :target: https://travis-ci.org/codeix/pyecma
+
 .. contents::
 
 Description
