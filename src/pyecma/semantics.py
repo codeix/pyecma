@@ -3,6 +3,7 @@ from pyecma import parser
 from pyecma import elements
 
 
+
 class EcmaSemantics(parser.EcmaSemantics):
 
     def expression(self, ast):
@@ -75,6 +76,18 @@ class EcmaSemantics(parser.EcmaSemantics):
         ast.name.create = True
         return ast
 
+    def object(self, ast):
+        items = ast.objectitems
+        if len(items) is 2:
+            items = items[0] + [items[1]]
+        return types.Object(items)
+
+    def array(self, ast):
+        items = ast.listitems
+        if len(items) is 2:
+            items = items[0] + [items[1]]
+        return types.Array(items)
+
     def callable(self, ast):
         if len(ast.params) == 2:
             params = ast.params[1] + [ast.params[0]]
@@ -82,6 +95,8 @@ class EcmaSemantics(parser.EcmaSemantics):
             params = ast.params
         return elements.Callable(ast.name, params)
 
+    def accessible(self, ast):
+        return elements.Accessible(ast.obj, ast.access)
 
     def code_block(self, ast):
         return elements.CodeBlock(ast)
@@ -90,7 +105,6 @@ class EcmaSemantics(parser.EcmaSemantics):
         if isinstance(ast, elements.CodeBlock):
             return ast
         return elements.CodeBlock([ast])
-        
 
     def variable_create(self, ast):
         ast.create = True

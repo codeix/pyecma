@@ -374,6 +374,20 @@ class Callable(object):
         return function(*[p(scope) for p in self.params])
 
 
+class Accessible(object):
+    
+    def __init__(self, obj, access):
+        self.obj = obj
+        self.access = access
+
+    def __call__(self, scope):
+        index = self.access(scope)
+        return self.obj(scope)[index[len(index)-1]]
+    
+    def __repr__(self):
+        return '<Accessible Array <[%s]>>' % ', '.join(self.items)
+
+
 class Variable(object):
     
     create = False

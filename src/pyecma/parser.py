@@ -13,19 +13,25 @@
 
 from __future__ import print_function, division, absolute_import, unicode_literals
 from grako.parsing import graken, Parser
+from grako.exceptions import *  # noqa
 
 
-__version__ = (2014, 7, 21, 23, 48, 44, 0)
+__version__ = '2014.08.15.12.56.36.04'
 
 __all__ = [
     'EcmaParser',
+    'EcmaSemanticParser',
     'EcmaSemantics',
     'main'
 ]
 
 
 class EcmaParser(Parser):
-    def __init__(self, whitespace=None, nameguard=True, **kwargs):
+    def __init__(
+        self,
+        whitespace=None,
+        nameguard=True,
+        **kwargs):
         super(EcmaParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
@@ -578,7 +584,7 @@ class EcmaParser(Parser):
 
     @graken()
     def _L_VARIABLE_REG_(self):
-        self._pattern(r'((?:[A-z]+[0-9]*)+)')
+        self._pattern(r'((?:[^\W0-9]+[0-9]*)+)')
 
     @graken()
     def _L_VARIABLE_(self):
@@ -729,6 +735,17 @@ class EcmaParser(Parser):
                 self._T_STRING_()
             with self._option():
                 self._L_VARIABLE_()
+            with self._option():
+                self._OBJECTTYPES_()
+            self._error('no available options')
+
+    @graken()
+    def _OBJECTTYPES_(self):
+        with self._choice():
+            with self._option():
+                self._object_()
+            with self._option():
+                self._array_()
             self._error('no available options')
 
     @graken()
@@ -792,6 +809,8 @@ class EcmaParser(Parser):
                     self._L_WS_()
                 with self._group():
                     with self._choice():
+                        with self._option():
+                            self._accessible_()
                         with self._option():
                             self._increment_()
                         with self._option():
@@ -1395,6 +1414,131 @@ class EcmaParser(Parser):
             self._program_common_()
         self._closure(block0)
 
+    @graken()
+    def _array_(self):
+        self._P_S_ARRAY_DELI_()
+        with self._group():
+            with self._optional():
+                self._L_WS_()
+
+            def block1():
+                self._content_()
+                with self._optional():
+                    self._L_WS_()
+                self._P_ARGS_DELIMITER_()
+                with self._optional():
+                    self._L_WS_()
+            self._closure(block1)
+            with self._optional():
+                self._content_()
+            with self._optional():
+                self._L_WS_()
+        self.ast['listitems'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_E_ARRAY_DELI_()
+
+        self.ast._define(
+            ['listitems'],
+            []
+        )
+
+    @graken()
+    def _object_(self):
+        self._P_SCB_()
+        with self._optional():
+            self._L_WS_()
+        with self._group():
+            with self._optional():
+                self._L_WS_()
+
+            def block1():
+                self._objectitem_()
+                with self._optional():
+                    self._L_WS_()
+                self._P_ARGS_DELIMITER_()
+                with self._optional():
+                    self._L_WS_()
+            self._closure(block1)
+            with self._optional():
+                self._objectitem_()
+            with self._optional():
+                self._L_WS_()
+        self.ast['objectitems'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_ECB_()
+
+        self.ast._define(
+            ['objectitems'],
+            []
+        )
+
+    @graken()
+    def _objectitem_(self):
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._T_STRING_()
+                with self._option():
+                    self._L_VARIABLE_()
+                self._error('no available options')
+        self.ast['key'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._P_PART_CONDITIONAL_OP_()
+        with self._optional():
+            self._L_WS_()
+        self._content_()
+        self.ast['value'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+
+        self.ast._define(
+            ['key', 'value'],
+            []
+        )
+
+    @graken()
+    def _content_(self):
+        with self._choice():
+            with self._option():
+                self._array_()
+            with self._option():
+                self._object_()
+            with self._option():
+                with self._optional():
+                    self._L_WS_()
+                self._K_FUNCTION_()
+                with self._optional():
+                    self._L_WS_()
+                self._function_body_()
+                with self._optional():
+                    self._L_WS_()
+            with self._option():
+                self._expression_()
+            self._error('no available options')
+
+    @graken()
+    def _accessible_(self):
+        with self._group():
+            with self._choice():
+                with self._option():
+                    self._accessible_()
+                with self._option():
+                    self._TYPES_()
+                self._error('no available options')
+        self.ast['obj'] = self.last_node
+        with self._optional():
+            self._L_WS_()
+        self._array_()
+        self.ast['access'] = self.last_node
+
+        self.ast._define(
+            ['obj', 'access'],
+            []
+        )
+
 
 class EcmaSemantics(object):
     def K_BREAK(self, ast):
@@ -1676,6 +1820,9 @@ class EcmaSemantics(object):
     def TYPES(self, ast):
         return ast
 
+    def OBJECTTYPES(self, ast):
+        return ast
+
     def expression(self, ast):
         return ast
 
@@ -1791,6 +1938,21 @@ class EcmaSemantics(object):
         return ast
 
     def switchcodeblock(self, ast):
+        return ast
+
+    def array(self, ast):
+        return ast
+
+    def object(self, ast):
+        return ast
+
+    def objectitem(self, ast):
+        return ast
+
+    def content(self, ast):
+        return ast
+
+    def accessible(self, ast):
         return ast
 
 
