@@ -13,25 +13,19 @@
 
 from __future__ import print_function, division, absolute_import, unicode_literals
 from grako.parsing import graken, Parser
-from grako.exceptions import *  # noqa
 
 
-__version__ = '2014.08.15.13.04.41.04'
+__version__ = (2014, 8, 15, 15, 23, 32, 4)
 
 __all__ = [
     'EcmaParser',
-    'EcmaSemanticParser',
     'EcmaSemantics',
     'main'
 ]
 
 
 class EcmaParser(Parser):
-    def __init__(
-        self,
-        whitespace=None,
-        nameguard=True,
-        **kwargs):
+    def __init__(self, whitespace=None, nameguard=True, **kwargs):
         super(EcmaParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
@@ -1503,12 +1497,6 @@ class EcmaParser(Parser):
     def _content_(self):
         with self._choice():
             with self._option():
-                self._accessible_()
-            with self._option():
-                self._array_()
-            with self._option():
-                self._object_()
-            with self._option():
                 with self._optional():
                     self._L_WS_()
                 self._K_FUNCTION_()
@@ -2001,4 +1989,9 @@ if __name__ == '__main__':
                         help="the start rule for parsing")
     args = parser.parse_args()
 
-    main(args.file, args.startrule, trace=args.trace, whitespace=args.whitespace)
+    main(
+        args.file,
+        args.startrule,
+        trace=args.trace,
+        whitespace=args.whitespace
+    )
