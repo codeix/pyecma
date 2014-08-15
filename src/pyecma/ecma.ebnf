@@ -184,7 +184,7 @@ switchcodeblock  = {program_common} ;
 array            = P_S_ARRAY_DELI listitems:([L_WS] {content [L_WS] P_ARGS_DELIMITER [L_WS]} [content] [L_WS]) [L_WS] P_E_ARRAY_DELI ;
 object           = P_SCB [L_WS] objectitems:([L_WS] {objectitem [L_WS] P_ARGS_DELIMITER [L_WS]} [objectitem] [L_WS]) [L_WS] P_ECB ;
 objectitem       = key:(T_STRING|L_VARIABLE) [L_WS] P_PART_CONDITIONAL_OP [L_WS] value:content [L_WS] ;
-content          = [L_WS] K_FUNCTION [L_WS] function_body [L_WS] | expression ;
-accessible       = obj:TYPES [L_WS] access:array ;
+content          = array | object | [L_WS] K_FUNCTION [L_WS] function_body [L_WS] | expression ;
+accessible       = obj:(accessible | TYPES) [L_WS] access:array ;
 
 
