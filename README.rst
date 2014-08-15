@@ -12,6 +12,11 @@ PyEcma is Python JavaScript interperter.
 Examples
 ========
 
+Import PyEcma
+-------------
+>>> import pyecma
+
+
 Basic Expressions
 -----------------
 
@@ -24,15 +29,15 @@ Basic Expressions
 ... """
 >>> app = pyecma.parse(js)
 >>> print(app.a)
-3
+3.0
 >>> print(app.b)
-7
+7.0
 >>> print(app.c)
-9
+9.0
 >>> print(app.d)
-18
+18.0
 >>> print(app.e)
-54
+54.0
 
 Function and Recursion
 ------------------------
@@ -46,8 +51,8 @@ Function and Recursion
 ...     }
 ... """
 >>> app = pyecma.parse(js)
->>> app.factorial(5)
-120
+>>> print(app.factorial(5))
+120.0
 
 
 Bidirectional
@@ -62,14 +67,14 @@ Bidirectional
 ...     }
 ... """
 >>> app = pyecma.parse(js)
->>> app.a
-1
+>>> print(app.a)
+1.0
 >>> app.a = 2
 >>> app.a
 2
 >>> app.increment()
-app.a
-3
+>>> print(app.a)
+3.0
 
 
 

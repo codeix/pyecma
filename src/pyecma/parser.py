@@ -16,7 +16,7 @@ from grako.parsing import graken, Parser
 from grako.exceptions import *  # noqa
 
 
-__version__ = '2014.08.15.12.56.36.04'
+__version__ = '2014.08.15.13.04.41.04'
 
 __all__ = [
     'EcmaParser',
@@ -1502,6 +1502,8 @@ class EcmaParser(Parser):
     @graken()
     def _content_(self):
         with self._choice():
+            with self._option():
+                self._accessible_()
             with self._option():
                 self._array_()
             with self._option():
