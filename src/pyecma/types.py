@@ -34,7 +34,7 @@ class Bool(int, AbstractType):
 class Undefined(AbstractType):
 
     def __repr__(self):
-        return '<ECMAScript undefined>'
+        return '<ECMAScript Undefined>'
 
 
 class NaN(AbstractType):
@@ -59,7 +59,15 @@ class Object(dict):
         for k, v in self.items():
             di[k(scope)] = v(scope)
         return di
-    
+
+    def __getitem__(self, name):
+        builtins = self.builtins()
+        if name in self:
+            return super(Object, self).__getitem__(name)
+        if name in builtins:
+            return builtins[name]
+        return Undefined()
+
     def __repr__(self):
         return '<ECMAScript Object <{%s}>>' % ', '.join(['%s: %s' % (repr(k),repr(v),) for k,v in self.items()])
 
@@ -72,6 +80,9 @@ class Array(Object):
     def __iter__(self):
         for i in self.values():
             yield i
+
+    def builtins(self):
+        return dict(length=Number(len(self)))
 
     def __repr__(self):
         return '<ECMAScript Array <[%s]>>' % ', '.join(repr(i) for i in self.values())

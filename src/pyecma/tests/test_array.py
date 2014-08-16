@@ -7,7 +7,7 @@ class ObjectsTestCase(unittest.TestCase):
 
 
     def test_2(self):
-        
+
         js = r"""
             var a = [1,2,3];
             var b = [1,2,1+2];
@@ -18,7 +18,7 @@ class ObjectsTestCase(unittest.TestCase):
         self.assertListEqual(app.a, [[1,2],[3,4],[5,6]], 'incorrect list')
 
     def test_2(self):
-        
+
         js = r"""
             var array = [1,2,3,4, 4+1];
             var a = array[1];
@@ -40,7 +40,7 @@ class ObjectsTestCase(unittest.TestCase):
         self.assertEqual(app.spez, 3, 'incorrect list')
 
     def test_3(self):
-        
+
         js = r"""
             var f1 = [[11, 22], [33, 44], [55, 66]][0][0];
             var f2 = [[11, 22], [33, 44], [55, 66]][0][1];
@@ -59,7 +59,7 @@ class ObjectsTestCase(unittest.TestCase):
         self.assertEqual(app.f6, 66, 'incorrect list')
 
     def test_4(self):
-        
+
         js = r"""
             var a = [[11, 22][1], [33, 44][0]][0];
             var b = [2, [4, 3, [4, [3, [3][0]]]][2][1]][1][1];
@@ -68,4 +68,15 @@ class ObjectsTestCase(unittest.TestCase):
         app = pyecma.parse(js)
         self.assertEqual(app.a, 22, 'incorrect list')
         self.assertEqual(app.b, 3, 'incorrect list')
+
+    def test_5(self):
+
+        js = r"""
+            var array = [11, 22, 33, 44];
+            var a = array.length;
+        """
+
+        app = pyecma.parse(js)
+        self.assertEqual(app.a, 4, 'incorrect length list')
+        
 
