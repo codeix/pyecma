@@ -31,9 +31,10 @@ K_IN = (?/in/?) ;
 K_TRY = (?/try/?) ;
 K_TRUE = (?/true/?) ;
 K_FALSE = (?/false/?) ;
+K_PROPERTY = (?/\./?) ;
 K_ALL = K_BREAK | K_DO | K_INSTANCEOF | K_TYPEOF | K_CASE | K_ELSE | K_NEW | K_VAR | K_CATCH | K_FINALLLY |
         K_RETURN | K_VOID | K_CONTINUE | K_FOR | K_SWITCH | K_WHILE | K_DEBUGGER | K_FUNCTION | K_THIS | K_WITH | 
-        K_DEFAULT | K_IF | K_THROW | K_DELETE | K_IN | K_TRY | K_TRUE | K_FALSE ;
+        K_DEFAULT | K_IF | K_THROW | K_DELETE | K_IN | K_TRY | K_TRUE | K_FALSE | K_PROPERTY;
 
 
 
@@ -124,7 +125,7 @@ OBJECTTYPES       = object | array ;
 expression  = cal:calculation comp:{compare} ;
 compare     = [L_WS] op:COMPARE_OPERATORS [L_WS] cal:calculation [L_WS] ;
 calculation = term ~ {(P_PLUS ~ term) | (P_MINUS ~ term)} ;
-factor      = [L_WS] (accessible | increment | callable | TYPES) [L_WS] | group ;
+factor      = [L_WS] (accessible | propertyaccess | increment | callable | TYPES) [L_WS] | group ;
 term        = factor ~ {(P_MULTIPLY ~ factor) | (P_DIVIDE ~ factor)} ;
 group       = [L_WS] P_S_OPER_DELI ~ expression ~ P_E_OPER_DELI [L_WS] ;
 
@@ -186,5 +187,10 @@ object           = P_SCB [L_WS] objectitems:([L_WS] {objectitem [L_WS] P_ARGS_DE
 objectitem       = key:(T_STRING|L_VARIABLE) [L_WS] P_PART_CONDITIONAL_OP [L_WS] value:content [L_WS] ;
 content          = [L_WS] K_FUNCTION [L_WS] function_body [L_WS] | expression ;
 accessible       = obj:(accessible | TYPES) [L_WS] access:array ;
+
+
+propertyaccessible = L_VARIABLE ;
+propertyaccess   = obj:propertyaccessible K_PROPERTY name:L_VARIABLE ;
+
 
 

@@ -15,7 +15,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import graken, Parser
 
 
-__version__ = (2014, 8, 15, 15, 23, 32, 4)
+__version__ = (2014, 8, 16, 10, 10, 27, 5)
 
 __all__ = [
     'EcmaParser',
@@ -173,6 +173,11 @@ class EcmaParser(Parser):
             self._pattern(r'false')
 
     @graken()
+    def _K_PROPERTY_(self):
+        with self._group():
+            self._pattern(r'\.')
+
+    @graken()
     def _K_ALL_(self):
         with self._choice():
             with self._option():
@@ -231,6 +236,8 @@ class EcmaParser(Parser):
                 self._K_TRUE_()
             with self._option():
                 self._K_FALSE_()
+            with self._option():
+                self._K_PROPERTY_()
             self._error('no available options')
 
     @graken()
@@ -805,6 +812,8 @@ class EcmaParser(Parser):
                     with self._choice():
                         with self._option():
                             self._accessible_()
+                        with self._option():
+                            self._propertyaccess_()
                         with self._option():
                             self._increment_()
                         with self._option():
@@ -1529,6 +1538,23 @@ class EcmaParser(Parser):
             []
         )
 
+    @graken()
+    def _propertyaccessible_(self):
+        self._L_VARIABLE_()
+
+    @graken()
+    def _propertyaccess_(self):
+        self._propertyaccessible_()
+        self.ast['obj'] = self.last_node
+        self._K_PROPERTY_()
+        self._L_VARIABLE_()
+        self.ast['name'] = self.last_node
+
+        self.ast._define(
+            ['obj', 'name'],
+            []
+        )
+
 
 class EcmaSemantics(object):
     def K_BREAK(self, ast):
@@ -1613,6 +1639,9 @@ class EcmaSemantics(object):
         return ast
 
     def K_FALSE(self, ast):
+        return ast
+
+    def K_PROPERTY(self, ast):
         return ast
 
     def K_ALL(self, ast):
@@ -1943,6 +1972,12 @@ class EcmaSemantics(object):
         return ast
 
     def accessible(self, ast):
+        return ast
+
+    def propertyaccessible(self, ast):
+        return ast
+
+    def propertyaccess(self, ast):
         return ast
 
 

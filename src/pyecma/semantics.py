@@ -116,6 +116,9 @@ class EcmaSemantics(parser.EcmaSemantics):
     def post_increment(self, ast):
         return elements.Increment(ast.oper, ast.var, False)
 
+    def propertyaccess(self, ast):
+        return elements.PropertyAccess(ast.obj, ast.name)
+
     def P_PLUS_INC(self, ast):
         return elements.Assign(lambda x,y: x+y, '+')
 
