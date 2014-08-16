@@ -410,7 +410,7 @@ class Expression(object):
     def __init__(self, calculation, compares):
         self.calculation = calculation
         self.compares = compares
-    
+
     def __call__(self, scope=None):
         re = self.calculation(scope)
         for comp in self.compares:
@@ -422,7 +422,7 @@ class Expression(object):
 
 
 class PropertyAccess(object):
-    
+
     def __init__(self, obj, name):
         self.obj = obj
         self.name = name

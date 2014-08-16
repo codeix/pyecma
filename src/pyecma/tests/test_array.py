@@ -6,16 +6,22 @@ import unittest
 class ObjectsTestCase(unittest.TestCase):
 
 
-    def test_2(self):
+    def test_1(self):
 
         js = r"""
             var a = [1,2,3];
             var b = [1,2,1+2];
             var c = [[1,2],[3,4],[5,6]];
+            var d = [['1','2'],['3','4'],['5','6']];
         """
 
         app = pyecma.parse(js)
-        self.assertListEqual(app.a, [[1,2],[3,4],[5,6]], 'incorrect list')
+        self.assertSequenceEqual(app.a, [1, 2 ,3], 'incorrect list')
+        self.assertSequenceEqual(app.b, [1, 2 ,3], 'incorrect list')
+        for index, key in enumerate([[1,2], [3,4], [5,6]]):
+            self.assertSequenceEqual(app.c[index], key, 'incorrect list')
+        for index, key in enumerate([['1','2'], ['3','4'], ['5','6']]):
+            self.assertSequenceEqual(app.d[index], key, 'incorrect list')
 
     def test_2(self):
 
