@@ -6,7 +6,7 @@
 Description
 ===========
 
-PyEcma is Python JavaScript interperter.
+PyEcma is a Python JavaScript interperter.
 
 
 Examples
