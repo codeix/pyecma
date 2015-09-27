@@ -57,8 +57,15 @@ class Object(dict):
     def __call__(self, scope):
         di = self.__class__([])
         for k, v in self.items():
-            di[k(scope)] = v(scope)
+            try:
+                di[k(scope)] = v(scope)
+            except:
+                import pdb;pdb.set_trace()
         return di
+
+    def builtins(self):
+        # empty at the moment
+        return dict()
 
     def __getitem__(self, name):
         builtins = self.builtins()
@@ -69,7 +76,7 @@ class Object(dict):
         return Undefined()
 
     def __repr__(self):
-        return '<ECMAScript Object <{%s}>>' % ', '.join(['%s: %s' % (repr(k),repr(v),) for k,v in self.items()])
+        return '<ECMAScript Object <{%s}>>' % ', '.join(['%s: %s' % (str(k),repr(v),) for k,v in self.items()])
 
 
 class Array(Object):

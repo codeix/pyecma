@@ -80,6 +80,8 @@ class EcmaSemantics(parser.EcmaSemantics):
         items = ast.objectitems
         if len(items) is 2:
             items = items[0] + [items[1]]
+        conv = lambda key: types.String(key.name) if isinstance(key, elements.Variable) else key
+        items = map(lambda ast: (conv(ast.key), ast.value,), items)
         return types.Object(items)
 
     def array(self, ast):
