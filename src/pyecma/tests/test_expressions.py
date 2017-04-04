@@ -132,3 +132,12 @@ class ExpressionsTestCase(unittest.TestCase):
         self.assertEqual(app.a, 'Hello World', 'incorrect comparison')
         self.assertEqual(app.b, 'code is continue here', 'incorrect comparison')
 
+
+    def test_8(self):
+        js = r"""
+            var z = 9;
+            var out = --z + 3 * --z;
+        """
+        app = pyecma.parse(js)
+        self.assertEqual(app.out, 29, 'decrement wrong')
+
